@@ -757,7 +757,9 @@ function showAuthModal(mode='signin'){
   document.getElementById('gh-btn').onclick=()=>sb.auth.signInWithOAuth({provider:'github',options:{redirectTo:window.location.href}});
   document.getElementById('gg-btn').onclick=()=>sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.href}});
   document.getElementById('a-switch').onclick=()=>showAuthModal(isSignin?'signup':'signin');
+  let submitting=false;
   document.getElementById('a-submit').onclick=async()=>{
+    if(submitting)return;
     const email=document.getElementById('a-email').value.trim();
     const pass=document.getElementById('a-pass').value;
     const errEl=document.getElementById('auth-err');errEl.style.display='none';
@@ -767,26 +769,26 @@ function showAuthModal(mode='signin'){
       if(pass!==pass2){showAuthError('Passwords do not match.');return;}
       if(pass.length<6){showAuthError('Password must be at least 6 characters.');return;}
     }
+    submitting=true;
     const btn=document.getElementById('a-submit');btn.textContent='Please wait…';btn.disabled=true;
     try{
       if(isSignin){
         const{error}=await sb.auth.signInWithPassword({email,password:pass});
-        if(error){showAuthError(error.message);btn.textContent='Sign in';btn.disabled=false;}
+        if(error){showAuthError(error.message);btn.textContent='Sign in';btn.disabled=false;submitting=false;}
       } else {
         const{data,error}=await sb.auth.signUp({email,password:pass});
         btn.textContent='Create account';btn.disabled=false;
         if(error){
           showAuthError(error.message);
-        } else if(!data?.user){
-          // user null = email already registered (Supabase silent duplicate)
-          showAuthError('This email is already registered. Please sign in instead.');
+          btn.textContent='Create account';btn.disabled=false;submitting=false;
         } else {
-          showAuthError('✅ Account created! Check your email to confirm, then sign in.',true);
+          showAuthError('✅ Confirmation email sent! Please check your inbox and confirm your email to sign in.',true);
+          submitting=false;
         }
       }
     }catch(e){
       showAuthError('Error: '+e.message);
-      btn.textContent=isSignin?'Sign in':'Create account';btn.disabled=false;
+      btn.textContent=isSignin?'Sign in':'Create account';btn.disabled=false;submitting=false;
     }
   };
   document.getElementById('a-pass').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('a-submit').click();});
