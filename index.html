@@ -218,30 +218,37 @@ let folders=[],sites=[],isPublic=false,activeFolder='all',searchQuery='';
 
 // ── INIT ───────────────────────────────────────────────────────────────────
 async function init(){
+  // Handle OAuth redirect: Supabase puts tokens in the URL hash
+  if(window.location.hash&&window.location.hash.includes('access_token')){
+    // Let Supabase parse the hash and establish the session
+    await sb.auth.getSession();
+    // Clean up the URL
+    history.replaceState(null,'',window.location.pathname);
+  }
+
   const{data:{session}}=await sb.auth.getSession();
   if(session){user=session.user;await loadData();}
   showApp();
+
   sb.auth.onAuthStateChange(async(event,session)=>{
-    if(event==='SIGNED_IN'&&session){
-      user=session.user;
-      // merge guest data into account then reload
+    if((event==='SIGNED_IN'||event==='TOKEN_REFRESHED')&&session&&(!user||user.id!==session.user.id)){
       const gFolders=[...folders],gSites=[...sites];
+      user=session.user;
       await loadData();
-      // if guest had data, offer to keep it
+      closeModal();
+      showApp();
+      // offer to import guest data
       if(gSites.length>0&&confirm(`You had ${gSites.length} site(s) added as guest. Import them into your account?`)){
         for(const f of gFolders){
           const{data:nf}=await sb.from('folders').insert({user_id:user.id,name:f.name}).select().single();
-          if(nf){
-            // remap site folder references
-            gSites.forEach(s=>{if(s.folder_id===f.id)s.folder_id=nf.id;});
-          }
+          if(nf)gSites.forEach(s=>{if(s.folder_id===f.id)s.folder_id=nf.id;});
         }
         for(const s of gSites){
           await sb.from('sites').insert({user_id:user.id,url:s.url,name:s.name,description:s.description,folder_id:s.folder_id||null});
         }
         await loadData();
+        render();
       }
-      closeModal();showApp();
     } else if(event==='SIGNED_OUT'){
       user=null;folders=[];sites=[];isPublic=false;showApp();
     }
@@ -387,18 +394,28 @@ function guestAddSite(data){
   const s={id:'g_'+Date.now(),...data};sites.push(s);render();toast('Site added (guest — not saved)');return s;
 }
 
+async function ensureSession(){
+  // Re-check session in case it was established after page load
+  if(!user){
+    const{data:{session}}=await sb.auth.getSession();
+    if(session){user=session.user;await loadData();showApp();}
+  }
+  return!!user;
+}
 async function saveFolder(name){
-  if(!user){guestAddFolder(name);return;}
+  if(!(await ensureSession())){guestAddFolder(name);return;}
   const{data,error}=await sb.from('folders').insert({user_id:user.id,name}).select().single();
-  if(!error){folders.push(data);render();toast('Category created');}
+  if(error){toast('Error: '+error.message);console.error(error);return;}
+  folders.push(data);render();toast('Category created');
 }
 async function updateFolder(id,name){
-  if(!user){folders.find(f=>f.id===id).name=name;render();return;}
-  await sb.from('folders').update({name}).eq('id',id).eq('user_id',user.id);
+  if(!(await ensureSession())){folders.find(f=>f.id===id).name=name;render();return;}
+  const{error}=await sb.from('folders').update({name}).eq('id',id).eq('user_id',user.id);
+  if(error){toast('Error: '+error.message);return;}
   folders.find(f=>f.id===id).name=name;render();toast('Category renamed');
 }
 async function deleteFolder(id){
-  if(!user){
+  if(!(await ensureSession())){
     folders=folders.filter(f=>f.id!==id);
     sites.forEach(s=>{if(s.folder_id===id)s.folder_id=null;});
     if(activeFolder===id)activeFolder='all';render();return;
@@ -409,17 +426,19 @@ async function deleteFolder(id){
   if(activeFolder===id)activeFolder='all';render();toast('Category deleted');
 }
 async function saveSite(data){
-  if(!user){guestAddSite(data);return;}
+  if(!(await ensureSession())){guestAddSite(data);return;}
   const{data:row,error}=await sb.from('sites').insert({user_id:user.id,...data}).select().single();
-  if(!error){sites.push(row);render();toast('Site added');}
+  if(error){toast('Error: '+error.message);console.error(error);return;}
+  sites.push(row);render();toast('Site added');
 }
 async function updateSite(id,data){
-  if(!user){Object.assign(sites.find(s=>s.id===id),data);render();return;}
-  await sb.from('sites').update(data).eq('id',id).eq('user_id',user.id);
+  if(!(await ensureSession())){Object.assign(sites.find(s=>s.id===id),data);render();return;}
+  const{error}=await sb.from('sites').update(data).eq('id',id).eq('user_id',user.id);
+  if(error){toast('Error: '+error.message);return;}
   Object.assign(sites.find(s=>s.id===id),data);render();toast('Site updated');
 }
 async function deleteSite(id){
-  if(!user){sites=sites.filter(s=>s.id!==id);render();return;}
+  if(!(await ensureSession())){sites=sites.filter(s=>s.id!==id);render();return;}
   await sb.from('sites').delete().eq('id',id).eq('user_id',user.id);
   sites=sites.filter(s=>s.id!==id);render();toast('Site removed');
 }
@@ -567,9 +586,15 @@ function openSiteModal(data){
     const description=document.getElementById('f-desc').value.trim();
     const folder_id=document.getElementById('f-folder').value||null;
     const btn=document.getElementById('m-save');btn.textContent='Saving…';btn.disabled=true;
-    if(isEdit)await updateSite(data.id,{url,name,description,folder_id});
-    else await saveSite({url,name,description,folder_id});
-    closeModal();
+    try{
+      if(isEdit)await updateSite(data.id,{url,name,description,folder_id});
+      else await saveSite({url,name,description,folder_id});
+      closeModal();
+    }catch(e){
+      toast('Something went wrong — check console');
+      console.error(e);
+      btn.textContent=isEdit?'Save Changes':'Add Site';btn.disabled=false;
+    }
   };
   urlInput.focus();
 }
