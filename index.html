@@ -11,13 +11,14 @@
   --bg:#f7f6f3;--surface:#ffffff;--border:#e8e6e1;--border-strong:#d0cdc6;
   --text:#1c1b18;--text-muted:#8a8780;--text-light:#b5b2ac;
   --accent:#2563eb;--accent-bg:#eff6ff;--accent-muted:#bfdbfe;
-  --danger:#dc2626;--success:#16a34a;
+  --danger:#dc2626;--warn-bg:#fffbeb;--warn-border:#fcd34d;--warn-text:#92400e;
   --sidebar-w:240px;--topbar-h:60px;
   --radius:12px;--radius-sm:8px;
-  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
-  --shadow-md:0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);
+  --shadow:0 1px 3px rgba(0,0,0,.06);--shadow-md:0 4px 16px rgba(0,0,0,.08);
 }
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;font-size:15px}
+
+/* TOPBAR */
 #topbar{position:fixed;top:0;left:0;right:0;height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:0 20px;z-index:100}
 .logo{font-weight:600;font-size:17px;color:var(--text);white-space:nowrap;display:flex;align-items:center;gap:8px;margin-right:4px}
 .logo-dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
@@ -34,30 +35,47 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .btn-sm{padding:6px 12px;font-size:12px}
 .btn-ghost{border-color:transparent;background:transparent}
 .btn-ghost:hover{background:var(--bg);border-color:var(--border)}
+.btn-danger{background:var(--danger);color:#fff;border-color:var(--danger)}
 .avatar{width:32px;height:32px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;cursor:pointer;flex-shrink:0;overflow:hidden}
 .avatar img{width:100%;height:100%;object-fit:cover}
+
+/* LAYOUT */
 #layout{display:flex;margin-top:var(--topbar-h);min-height:calc(100vh - var(--topbar-h))}
+
+/* SIDEBAR */
 #sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;position:fixed;top:var(--topbar-h);bottom:0;overflow-y:auto}
 .sidebar-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-light);padding:0 18px;margin:16px 0 6px}
 .folder-item{display:flex;align-items:center;gap:10px;padding:9px 18px;cursor:pointer;font-size:14px;transition:background .12s;position:relative;color:var(--text-muted)}
 .folder-item:hover{background:var(--bg);color:var(--text)}
 .folder-item.active{background:var(--accent-bg);color:var(--accent);font-weight:500}
-.fi-icon{font-size:16px;flex-shrink:0}
-.fi-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fi-icon{font-size:16px;flex-shrink:0}.fi-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fi-count{font-size:11px;font-family:'DM Mono',monospace;background:var(--bg);color:var(--text-light);padding:1px 7px;border-radius:10px;border:1px solid var(--border)}
 .folder-item.active .fi-count{background:var(--accent-muted);color:var(--accent);border-color:var(--accent-muted)}
-.folder-actions{display:none;gap:2px}
-.folder-item:hover .folder-actions{display:flex}
+.folder-actions{display:none;gap:2px}.folder-item:hover .folder-actions{display:flex}
 .ico-btn{width:22px;height:22px;border-radius:5px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--text-muted);transition:background .12s}
 .ico-btn:hover{background:var(--border);color:var(--text)}
 #add-folder-btn{display:flex;align-items:center;gap:10px;width:100%;padding:9px 18px;font-size:14px;color:var(--text-light);border:none;background:transparent;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .12s}
 #add-folder-btn:hover{background:var(--bg);color:var(--text-muted)}
+
+/* MAIN */
 #main{margin-left:var(--sidebar-w);flex:1;padding:28px 28px 40px}
-.page-header{display:flex;align-items:center;gap:10px;margin-bottom:22px}
+.page-header{display:flex;align-items:center;gap:10px;margin-bottom:16px}
 .page-title{font-size:20px;font-weight:600;color:var(--text)}
 .public-badge{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:500;background:#dcfce7;color:#15803d;border:1px solid #bbf7d0}
+
+/* GUEST BANNER */
+#guest-banner{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  background:var(--warn-bg);border:1px solid var(--warn-border);
+  border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:20px;
+  font-size:13px;color:var(--warn-text);
+}
+#guest-banner strong{font-weight:600}
+.banner-actions{display:flex;gap:8px;flex-shrink:0}
+
+/* GRID */
 #sites-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:14px}
-.site-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 14px 14px;display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer;transition:all .18s;position:relative;text-decoration:none;color:inherit}
+.site-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 14px 14px;display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer;transition:all .18s;position:relative}
 .site-card:hover{box-shadow:var(--shadow-md);border-color:var(--border-strong);transform:translateY(-2px)}
 .site-logo{width:52px;height:52px;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--accent-bg);color:var(--accent);font-size:22px;font-weight:700;flex-shrink:0;border:1px solid var(--border)}
 .site-logo img{width:100%;height:100%;object-fit:contain;display:block}
@@ -74,6 +92,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .empty-icon{font-size:44px;opacity:.5}
 .empty-state p{font-size:15px;color:var(--text-muted)}
 .search-banner{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--accent-bg);border:1px solid var(--accent-muted);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:18px;font-size:13px;color:var(--accent)}
+
+/* MODAL */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(2px);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px}
 .modal{background:var(--surface);border-radius:16px;width:100%;max-width:460px;box-shadow:0 24px 64px rgba(0,0,0,.16);animation:popIn .2s cubic-bezier(.34,1.56,.64,1);border:1px solid var(--border)}
 @keyframes popIn{from{opacity:0;transform:scale(.94) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
@@ -92,62 +112,74 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .url-row .field{flex:1;margin-bottom:0}
 #fav-preview{width:44px;height:44px;border-radius:10px;border:1px solid var(--border);background:var(--accent-bg);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;overflow:hidden}
 #fav-preview img{width:100%;height:100%;object-fit:contain}
+
+/* AUTH MODAL */
+.auth-modal{max-width:400px}
+.auth-title{font-size:22px;font-weight:600;margin-bottom:6px}
+.auth-sub{font-size:14px;color:var(--text-muted);margin-bottom:24px;line-height:1.6}
+.social-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:11px 16px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'DM Sans',sans-serif;transition:all .15s;margin-bottom:10px}
+.social-btn:hover{background:var(--bg);border-color:var(--border-strong)}
+.social-btn.github{background:#24292e;color:#fff;border-color:#24292e}
+.social-btn.github:hover{background:#1a1f23}
+.social-btn.google{background:#fff;border-color:#e0e0e0}
+.social-btn.google:hover{background:#f8f8f8}
+.divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--text-light);font-size:12px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.auth-toggle{text-align:center;font-size:13px;color:var(--text-muted);margin-top:16px}
+.auth-toggle a{color:var(--accent);cursor:pointer;text-decoration:none}
+.auth-toggle a:hover{text-decoration:underline}
+.auth-error{background:#fef2f2;border:1px solid #fecaca;border-radius:var(--radius-sm);padding:10px 13px;font-size:13px;color:var(--danger);margin-bottom:14px;display:none}
+
+/* UNSAVED WARN */
+.unsaved-warn{background:var(--warn-bg);border:1px solid var(--warn-border);border-radius:var(--radius-sm);padding:12px 14px;font-size:13px;color:var(--warn-text);margin-bottom:16px;display:flex;align-items:flex-start;gap:10px}
+.unsaved-warn .warn-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+
+/* CTX MENU */
 .ctx{position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md);z-index:300;min-width:168px;overflow:hidden;animation:ctxPop .12s ease}
 @keyframes ctxPop{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
 .ctx-item{display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:13px;cursor:pointer;transition:background .1s}
 .ctx-item:hover{background:var(--bg)}
 .ctx-item.danger{color:var(--danger)}
 .ctx-sep{height:1px;background:var(--border);margin:4px 0}
-#login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:500}
-.login-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:48px 40px;max-width:400px;width:100%;text-align:center;box-shadow:var(--shadow-md)}
-.login-logo{font-size:40px;margin-bottom:16px}
-.login-card h1{font-size:26px;font-weight:600;margin-bottom:8px}
-.login-card p{color:var(--text-muted);font-size:15px;margin-bottom:32px;line-height:1.6}
-.btn-github{display:inline-flex;align-items:center;gap:10px;padding:12px 24px;border-radius:var(--radius-sm);font-size:15px;font-weight:500;background:#24292e;color:#fff;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s;width:100%;justify-content:center}
-.btn-github:hover{background:#1a1f23}
-.github-ico{width:20px;height:20px;fill:#fff}
+
+/* USER MENU */
+.user-menu{position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md);z-index:300;min-width:200px;overflow:hidden;animation:ctxPop .12s ease}
+.user-info{padding:14px;border-bottom:1px solid var(--border)}
+.u-name{font-weight:500;font-size:14px}.u-email{font-size:12px;color:var(--text-muted);margin-top:2px}
+
+/* LOADING */
 #loading{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:400}
 .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.user-menu{position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md);z-index:300;min-width:200px;overflow:hidden;animation:ctxPop .12s ease}
-.user-info{padding:14px;border-bottom:1px solid var(--border)}
-.u-name{font-weight:500;font-size:14px}
-.u-email{font-size:12px;color:var(--text-muted);margin-top:2px}
+
+/* TOAST */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1c1b18;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;z-index:999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none}
 .toast.show{transform:translateX(-50%) translateY(0)}
 .share-url{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 13px;font-size:12px;font-family:'DM Mono',monospace;word-break:break-all;color:var(--text-muted);margin-top:10px}
+
+/* Google icon SVG */
+.g-ico{width:18px;height:18px;flex-shrink:0}
+.gh-ico{width:18px;height:18px;fill:currentColor;flex-shrink:0}
 </style>
 </head>
 <body>
 
 <div id="loading"><div class="spinner"></div></div>
 
-<div id="login-screen" style="display:none">
-  <div class="login-card">
-    <div class="login-logo">🧭</div>
-    <h1>My Navigator</h1>
-    <p>Your personal homepage for the web.<br/>Sign in to save and access your sites from anywhere.</p>
-    <button class="btn-github" id="github-login-btn">
-      <svg class="github-ico" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
-      Continue with GitHub
-    </button>
-  </div>
-</div>
-
-<div id="topbar" style="display:none">
+<div id="topbar">
   <div class="logo"><div class="logo-dot"></div>Navigator</div>
   <div id="search-wrap">
     <span class="search-ico">🔍</span>
     <input type="text" id="search-input" placeholder="Search sites, categories, descriptions…" autocomplete="off"/>
   </div>
   <div class="topbar-right">
-    <button class="btn btn-sm btn-ghost" id="share-btn">🔗 Share</button>
+    <button class="btn btn-sm btn-ghost" id="share-btn" style="display:none">🔗 Share</button>
     <button class="btn btn-sm btn-primary" id="add-site-btn">+ Add Site</button>
-    <div class="avatar" id="avatar-btn"></div>
+    <div id="auth-area"></div>
   </div>
 </div>
 
-<div id="layout" style="display:none">
+<div id="layout">
   <div id="sidebar">
     <div class="sidebar-label">Categories</div>
     <div id="folder-list"></div>
@@ -157,6 +189,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="page-header">
       <div class="page-title" id="page-title">All Sites</div>
       <span id="public-badge" style="display:none" class="public-badge">Public</span>
+    </div>
+    <div id="guest-banner" style="display:none">
+      <div><strong>👋 You're browsing as a guest.</strong> Any sites or categories you add won't be saved when you leave. Sign in to keep your data across all devices.</div>
+      <div class="banner-actions">
+        <button class="btn btn-sm" id="banner-signin-btn">Sign in</button>
+        <button class="btn btn-sm btn-primary" id="banner-signup-btn">Create account</button>
+      </div>
     </div>
     <div id="search-banner" style="display:none"></div>
     <div id="sites-grid"></div>
@@ -172,37 +211,165 @@ const SUPABASE_URL='https://vhljeqeqedtrqspevidm.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZobGplcWVxZWR0cnFzcGV2aWRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzk3NDEsImV4cCI6MjA5NDk1NTc0MX0.TcUhUJFSsYMrbIYh7yh9Zb1bkVzCa5Eys7Koddo3G9o';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-let user=null,folders=[],sites=[],isPublic=false,activeFolder='all',searchQuery='';
+// ── STATE ──────────────────────────────────────────────────────────────────
+let user=null;
+// For guests, data lives only in memory
+let folders=[],sites=[],isPublic=false,activeFolder='all',searchQuery='';
 
+// ── INIT ───────────────────────────────────────────────────────────────────
 async function init(){
-  const {data:{session}}=await sb.auth.getSession();
-  if(session){user=session.user;await loadData();showApp();}
-  else showLogin();
+  const{data:{session}}=await sb.auth.getSession();
+  if(session){user=session.user;await loadData();}
+  showApp();
   sb.auth.onAuthStateChange(async(event,session)=>{
-    if(event==='SIGNED_IN'&&session){user=session.user;await loadData();showApp();}
-    else if(event==='SIGNED_OUT'){user=null;folders=[];sites=[];showLogin();}
+    if(event==='SIGNED_IN'&&session){
+      user=session.user;
+      // merge guest data into account then reload
+      const gFolders=[...folders],gSites=[...sites];
+      await loadData();
+      // if guest had data, offer to keep it
+      if(gSites.length>0&&confirm(`You had ${gSites.length} site(s) added as guest. Import them into your account?`)){
+        for(const f of gFolders){
+          const{data:nf}=await sb.from('folders').insert({user_id:user.id,name:f.name}).select().single();
+          if(nf){
+            // remap site folder references
+            gSites.forEach(s=>{if(s.folder_id===f.id)s.folder_id=nf.id;});
+          }
+        }
+        for(const s of gSites){
+          await sb.from('sites').insert({user_id:user.id,url:s.url,name:s.name,description:s.description,folder_id:s.folder_id||null});
+        }
+        await loadData();
+      }
+      closeModal();showApp();
+    } else if(event==='SIGNED_OUT'){
+      user=null;folders=[];sites=[];isPublic=false;showApp();
+    }
   });
 }
 
-function showLogin(){
-  document.getElementById('loading').style.display='none';
-  document.getElementById('login-screen').style.display='flex';
-  document.getElementById('topbar').style.display='none';
-  document.getElementById('layout').style.display='none';
-}
 function showApp(){
   document.getElementById('loading').style.display='none';
-  document.getElementById('login-screen').style.display='none';
-  document.getElementById('topbar').style.display='flex';
-  document.getElementById('layout').style.display='flex';
-  renderAvatar();render();
+  document.getElementById('layout').style.marginTop='';
+  renderAuthArea();
+  render();
 }
 
-document.getElementById('github-login-btn').onclick=async()=>{
-  await sb.auth.signInWithOAuth({provider:'github',options:{redirectTo:window.location.href}});
-};
+// ── AUTH AREA (top right) ──────────────────────────────────────────────────
+function renderAuthArea(){
+  const area=document.getElementById('auth-area');
+  const shareBtn=document.getElementById('share-btn');
+  if(user){
+    shareBtn.style.display='inline-flex';
+    const meta=user.user_metadata||{};
+    const name=(meta.full_name||meta.user_name||user.email||'U');
+    const avatarContent=meta.avatar_url
+      ?`<img src="${meta.avatar_url}" alt=""/>`
+      :name[0].toUpperCase();
+    area.innerHTML=`<div class="avatar" id="avatar-btn">${avatarContent}</div>`;
+    document.getElementById('avatar-btn').onclick=e=>{e.stopPropagation();showUserMenu();};
+  } else {
+    shareBtn.style.display='none';
+    area.innerHTML=`
+      <button class="btn btn-sm btn-ghost" id="topbar-signin">Sign in</button>
+      <button class="btn btn-sm btn-primary" id="topbar-signup">Sign up</button>`;
+    document.getElementById('topbar-signin').onclick=()=>showAuthModal('signin');
+    document.getElementById('topbar-signup').onclick=()=>showAuthModal('signup');
+  }
+}
 
+// ── AUTH MODAL ─────────────────────────────────────────────────────────────
+function showAuthModal(mode='signin'){
+  const isSignin=mode==='signin';
+  openModal(`
+    <div class="modal-head" style="padding-bottom:18px">
+      <div>
+        <div class="auth-title">${isSignin?'Welcome back':'Create account'}</div>
+        <div class="auth-sub">${isSignin?'Sign in to sync your navigator across all devices.':'Sign up free — your data stays private and syncs everywhere.'}</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="mc" style="align-self:flex-start">✕</button>
+    </div>
+    <div class="modal-body" style="padding-top:0">
+      <button class="social-btn github" id="gh-btn">
+        <svg class="gh-ico" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+        Continue with GitHub
+      </button>
+      <button class="social-btn google" id="gg-btn">
+        <svg class="g-ico" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Continue with Google
+      </button>
+      <div class="divider">or ${isSignin?'sign in':'sign up'} with email</div>
+      <div class="auth-error" id="auth-err"></div>
+      <div class="field"><label>Email</label><input type="email" id="a-email" placeholder="you@example.com" autocomplete="email"/></div>
+      <div class="field"><label>Password</label><input type="password" id="a-pass" placeholder="${isSignin?'Your password':'At least 6 characters'}" autocomplete="${isSignin?'current-password':'new-password'}"/></div>
+      ${!isSignin?`<div class="field"><label>Confirm Password</label><input type="password" id="a-pass2" placeholder="Repeat password" autocomplete="new-password"/></div>`:''}
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:11px" id="a-submit">${isSignin?'Sign in':'Create account'}</button>
+      <div class="auth-toggle">
+        ${isSignin
+          ?`Don't have an account? <a id="a-switch">Sign up free</a>`
+          :`Already have an account? <a id="a-switch">Sign in</a>`}
+      </div>
+    </div>
+  `,'auth-modal');
+
+  document.getElementById('mc').onclick=closeModal;
+  document.getElementById('gh-btn').onclick=()=>sb.auth.signInWithOAuth({provider:'github',options:{redirectTo:window.location.href}});
+  document.getElementById('gg-btn').onclick=()=>sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.href}});
+  document.getElementById('a-switch').onclick=()=>showAuthModal(isSignin?'signup':'signin');
+
+  document.getElementById('a-submit').onclick=async()=>{
+    const email=document.getElementById('a-email').value.trim();
+    const pass=document.getElementById('a-pass').value;
+    const errEl=document.getElementById('auth-err');
+    errEl.style.display='none';
+    if(!email||!pass){showAuthError('Please fill in all fields.');return;}
+    if(!isSignin){
+      const pass2=document.getElementById('a-pass2').value;
+      if(pass!==pass2){showAuthError('Passwords do not match.');return;}
+      if(pass.length<6){showAuthError('Password must be at least 6 characters.');return;}
+    }
+    const btn=document.getElementById('a-submit');
+    btn.textContent='Please wait…';btn.disabled=true;
+    const{error}=isSignin
+      ?await sb.auth.signInWithPassword({email,password:pass})
+      :await sb.auth.signUp({email,password:pass});
+    if(error){
+      showAuthError(error.message);
+      btn.textContent=isSignin?'Sign in':'Create account';btn.disabled=false;
+    } else if(!isSignin){
+      showAuthError('✅ Check your email to confirm your account, then sign in.',true);
+      btn.textContent='Create account';btn.disabled=false;
+    }
+  };
+
+  // enter key
+  document.getElementById('a-pass').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('a-submit').click();});
+  document.getElementById('a-email').focus();
+}
+
+function showAuthError(msg,success=false){
+  const el=document.getElementById('auth-err');
+  if(!el)return;
+  el.textContent=msg;
+  el.style.display='block';
+  if(success){el.style.background='#f0fdf4';el.style.borderColor='#86efac';el.style.color='#166534';}
+}
+
+// ── GUEST BANNER ──────────────────────────────────────────────────────────
+function renderGuestBanner(){
+  const banner=document.getElementById('guest-banner');
+  if(!user){
+    banner.style.display='flex';
+    document.getElementById('banner-signin-btn').onclick=()=>showAuthModal('signin');
+    document.getElementById('banner-signup-btn').onclick=()=>showAuthModal('signup');
+  } else {
+    banner.style.display='none';
+  }
+}
+
+// ── DATA ──────────────────────────────────────────────────────────────────
 async function loadData(){
+  if(!user)return;
   const[{data:f},{data:s},{data:p}]=await Promise.all([
     sb.from('folders').select('*').eq('user_id',user.id).order('created_at'),
     sb.from('sites').select('*').eq('user_id',user.id).order('created_at'),
@@ -212,53 +379,66 @@ async function loadData(){
   if(!p)await sb.from('profiles').insert({id:user.id,is_public:false});
 }
 
+// Guest mode: data only in memory
+function guestAddFolder(name){
+  const f={id:'g_'+Date.now(),name};folders.push(f);render();toast('Category created (guest — not saved)');return f;
+}
+function guestAddSite(data){
+  const s={id:'g_'+Date.now(),...data};sites.push(s);render();toast('Site added (guest — not saved)');return s;
+}
+
 async function saveFolder(name){
+  if(!user){guestAddFolder(name);return;}
   const{data,error}=await sb.from('folders').insert({user_id:user.id,name}).select().single();
   if(!error){folders.push(data);render();toast('Category created');}
 }
 async function updateFolder(id,name){
+  if(!user){folders.find(f=>f.id===id).name=name;render();return;}
   await sb.from('folders').update({name}).eq('id',id).eq('user_id',user.id);
   folders.find(f=>f.id===id).name=name;render();toast('Category renamed');
 }
 async function deleteFolder(id){
+  if(!user){
+    folders=folders.filter(f=>f.id!==id);
+    sites.forEach(s=>{if(s.folder_id===id)s.folder_id=null;});
+    if(activeFolder===id)activeFolder='all';render();return;
+  }
   await sb.from('folders').delete().eq('id',id).eq('user_id',user.id);
   folders=folders.filter(f=>f.id!==id);
   sites.forEach(s=>{if(s.folder_id===id)s.folder_id=null;});
-  if(activeFolder===id)activeFolder='all';
-  render();toast('Category deleted');
+  if(activeFolder===id)activeFolder='all';render();toast('Category deleted');
 }
 async function saveSite(data){
+  if(!user){guestAddSite(data);return;}
   const{data:row,error}=await sb.from('sites').insert({user_id:user.id,...data}).select().single();
   if(!error){sites.push(row);render();toast('Site added');}
 }
 async function updateSite(id,data){
+  if(!user){Object.assign(sites.find(s=>s.id===id),data);render();return;}
   await sb.from('sites').update(data).eq('id',id).eq('user_id',user.id);
   Object.assign(sites.find(s=>s.id===id),data);render();toast('Site updated');
 }
 async function deleteSite(id){
+  if(!user){sites=sites.filter(s=>s.id!==id);render();return;}
   await sb.from('sites').delete().eq('id',id).eq('user_id',user.id);
   sites=sites.filter(s=>s.id!==id);render();toast('Site removed');
 }
 async function togglePublic(){
+  if(!user)return;
   isPublic=!isPublic;
   await sb.from('profiles').upsert({id:user.id,is_public:isPublic});
   render();toast(isPublic?'Page is now public':'Page is now private');
 }
 
+// ── HELPERS ───────────────────────────────────────────────────────────────
 function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
 function urlHost(url){try{return new URL(url).hostname.replace('www.','');}catch(e){return url;}}
-function faviconUrl(url){try{return`https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=64`;}catch(e){return '';}}
+function faviconUrl(url){try{return`https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=64`;}catch(e){return'';}}
 function initial(site){return(site.name||site.url||'?')[0].toUpperCase();}
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
 
-function renderAvatar(){
-  const el=document.getElementById('avatar-btn');
-  const meta=user.user_metadata||{};
-  if(meta.avatar_url)el.innerHTML=`<img src="${meta.avatar_url}" alt=""/>`;
-  else el.textContent=(meta.full_name||meta.user_name||user.email||'U')[0].toUpperCase();
-}
-
-function render(){renderSidebar();renderMain();document.getElementById('public-badge').style.display=isPublic?'inline-flex':'none';}
+// ── RENDER ────────────────────────────────────────────────────────────────
+function render(){renderGuestBanner();renderSidebar();renderMain();document.getElementById('public-badge').style.display=(user&&isPublic)?'inline-flex':'none';}
 
 function renderSidebar(){
   const list=document.getElementById('folder-list');
@@ -276,8 +456,7 @@ function renderSidebar(){
   });
   list.querySelectorAll('[data-rename]').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();showRenameFolder(btn.dataset.rename);}));
   list.querySelectorAll('[data-del-folder]').forEach(btn=>btn.addEventListener('click',e=>{
-    e.stopPropagation();
-    if(confirm('Delete this category? Sites will move to All Sites.'))deleteFolder(btn.dataset.delFolder);
+    e.stopPropagation();if(confirm('Delete this category?'))deleteFolder(btn.dataset.delFolder);
   }));
 }
 
@@ -321,10 +500,10 @@ function renderMain(){
   document.getElementById('add-card-btn').onclick=()=>showAddModal();
 }
 
+// ── SITE MENU ─────────────────────────────────────────────────────────────
 let activeCtx=null;
 function closeCtx(){if(activeCtx){activeCtx.remove();activeCtx=null;}}
 document.addEventListener('click',closeCtx);
-
 function showSiteMenu(siteId,e){
   closeCtx();
   const site=sites.find(s=>s.id===siteId);if(!site)return;
@@ -343,15 +522,18 @@ function showSiteMenu(siteId,e){
   menu.querySelector('[data-del]')?.addEventListener('click',()=>{closeCtx();if(confirm('Remove this site?'))deleteSite(siteId);});
 }
 
+// ── ADD/EDIT MODAL ────────────────────────────────────────────────────────
 function showAddModal(){openSiteModal({url:'',name:'',description:'',folder_id:activeFolder!=='all'?activeFolder:''});}
 function showEditModal(id){const site=sites.find(s=>s.id===id);if(site)openSiteModal({...site,_editing:true});}
 
 function openSiteModal(data){
   const isEdit=data._editing;
   const folderOpts=folders.map(f=>`<option value="${f.id}" ${data.folder_id===f.id?'selected':''}>${esc(f.name)}</option>`).join('');
+  const guestWarn=!user?`<div class="unsaved-warn"><span class="warn-icon">⚠️</span><div>You're not signed in — this site will <strong>not be saved</strong> when you close your browser. <a href="#" id="warn-signin" style="color:var(--accent)">Sign in now</a> to keep your data.</div></div>`:'';
   openModal(`
     <div class="modal-head"><h3>${isEdit?'Edit Site':'Add New Site'}</h3><button class="btn btn-ghost btn-sm" id="mc">✕</button></div>
     <div class="modal-body">
+      ${guestWarn}
       <div class="url-row">
         <div id="fav-preview"><span>🌐</span></div>
         <div class="field" style="flex:1;margin-bottom:0"><label>URL <span class="required">*</span></label><input type="url" id="f-url" value="${esc(data.url)}" placeholder="https://example.com" autocomplete="off"/></div>
@@ -362,20 +544,17 @@ function openSiteModal(data){
     </div>
     <div class="modal-foot"><button class="btn" id="m-cancel">Cancel</button><button class="btn btn-primary" id="m-save">${isEdit?'Save Changes':'Add Site'}</button></div>
   `);
+  if(!user)document.getElementById('warn-signin')?.addEventListener('click',e=>{e.preventDefault();closeModal();showAuthModal('signin');});
   const urlInput=document.getElementById('f-url');
   const preview=document.getElementById('fav-preview');
-  function updatePreview(){
-    const fav=faviconUrl(urlInput.value.trim());
-    preview.innerHTML=fav?`<img src="${fav}" alt="" style="width:100%;height:100%;object-fit:contain" onerror="this.parentElement.innerHTML='<span style=font-size:22px>🌐</span>'"/>`:'<span style="font-size:22px">🌐</span>';
-  }
-  urlInput.addEventListener('input',updatePreview);
-  if(data.url)updatePreview();
+  function updatePreview(){const fav=faviconUrl(urlInput.value.trim());preview.innerHTML=fav?`<img src="${fav}" alt="" style="width:100%;height:100%;object-fit:contain" onerror="this.parentElement.innerHTML='<span style=font-size:22px>🌐</span>'"/>`:'<span style="font-size:22px">🌐</span>';}
+  urlInput.addEventListener('input',updatePreview);if(data.url)updatePreview();
   document.getElementById('mc').onclick=closeModal;
   document.getElementById('m-cancel').onclick=closeModal;
   document.getElementById('quick-cat').onclick=async e=>{
-    e.preventDefault();
-    const name=prompt('New category name:');
+    e.preventDefault();const name=prompt('New category name:');
     if(name?.trim()){
+      if(!user){const f=guestAddFolder(name.trim());const sel=document.getElementById('f-folder');sel.innerHTML+=`<option value="${f.id}" selected>${esc(f.name)}</option>`;sel.value=f.id;return;}
       const{data:f,error}=await sb.from('folders').insert({user_id:user.id,name:name.trim()}).select().single();
       if(!error){folders.push(f);const sel=document.getElementById('f-folder');sel.innerHTML+=`<option value="${f.id}" selected>${esc(f.name)}</option>`;sel.value=f.id;renderSidebar();}
     }
@@ -395,12 +574,17 @@ function openSiteModal(data){
   urlInput.focus();
 }
 
+// ── FOLDER MODALS ─────────────────────────────────────────────────────────
 document.getElementById('add-folder-btn').onclick=()=>{
   openModal(`
     <div class="modal-head"><h3>New Category</h3><button class="btn btn-ghost btn-sm" id="mc">✕</button></div>
-    <div class="modal-body"><div class="field"><label>Name</label><input type="text" id="f-cat-name" placeholder="e.g. AI Tools, Shopping, Work…"/></div></div>
+    <div class="modal-body">
+      ${!user?`<div class="unsaved-warn"><span class="warn-icon">⚠️</span><div>You're not signed in — this won't be saved. <a href="#" id="warn-signin" style="color:var(--accent)">Sign in first</a></div></div>`:''}
+      <div class="field"><label>Name</label><input type="text" id="f-cat-name" placeholder="e.g. AI Tools, Shopping, Work…"/></div>
+    </div>
     <div class="modal-foot"><button class="btn" id="m-cancel">Cancel</button><button class="btn btn-primary" id="m-save">Create</button></div>
   `);
+  if(!user)document.getElementById('warn-signin')?.addEventListener('click',e=>{e.preventDefault();closeModal();showAuthModal('signin');});
   document.getElementById('mc').onclick=closeModal;
   document.getElementById('m-cancel').onclick=closeModal;
   document.getElementById('m-save').onclick=async()=>{const name=document.getElementById('f-cat-name').value.trim();if(!name)return;await saveFolder(name);closeModal();};
@@ -420,7 +604,9 @@ function showRenameFolder(id){
   document.getElementById('f-cat-name').select();
 }
 
+// ── SHARE MODAL ───────────────────────────────────────────────────────────
 document.getElementById('share-btn').onclick=()=>{
+  if(!user)return;
   const shareUrl=`${window.location.origin}${window.location.pathname}?user=${user.id}`;
   openModal(`
     <div class="modal-head"><h3>Share Your Page</h3><button class="btn btn-ghost btn-sm" id="mc">✕</button></div>
@@ -440,26 +626,28 @@ document.getElementById('share-btn').onclick=()=>{
   document.getElementById('copy-url')?.addEventListener('click',()=>{navigator.clipboard.writeText(shareUrl);toast('Link copied!');});
 };
 
+// ── USER MENU ─────────────────────────────────────────────────────────────
 let userMenu=null;
-document.getElementById('avatar-btn').onclick=e=>{
-  e.stopPropagation();
+function showUserMenu(){
   if(userMenu){userMenu.remove();userMenu=null;return;}
   const meta=user.user_metadata||{};
   const menu=document.createElement('div');menu.className='user-menu';
   menu.innerHTML=`<div class="user-info"><div class="u-name">${esc(meta.full_name||meta.user_name||'')}</div><div class="u-email">${esc(user.email||'')}</div></div><div class="ctx-item danger" id="signout-btn">🚪 Sign out</div>`;
   document.body.appendChild(menu);userMenu=menu;
-  const r=document.getElementById('avatar-btn').getBoundingClientRect();
+  const r=document.getElementById('auth-area').getBoundingClientRect();
   menu.style.top=(r.bottom+8)+'px';menu.style.right=(window.innerWidth-r.right)+'px';
   document.getElementById('signout-btn').onclick=()=>sb.auth.signOut();
-};
+}
 document.addEventListener('click',()=>{if(userMenu){userMenu.remove();userMenu=null;}});
 
+// ── SEARCH ────────────────────────────────────────────────────────────────
 document.getElementById('search-input').addEventListener('input',e=>{searchQuery=e.target.value;render();});
 document.getElementById('add-site-btn').onclick=()=>showAddModal();
 
-function openModal(html){
+// ── MODAL HELPERS ─────────────────────────────────────────────────────────
+function openModal(html,extraClass=''){
   const root=document.getElementById('modal-root');
-  root.innerHTML=`<div class="overlay" id="overlay"><div class="modal">${html}</div></div>`;
+  root.innerHTML=`<div class="overlay" id="overlay"><div class="modal ${extraClass}">${html}</div></div>`;
   root.querySelector('#overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal();});
 }
 function closeModal(){document.getElementById('modal-root').innerHTML='';}
