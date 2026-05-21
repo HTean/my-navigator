@@ -1,7 +1,3 @@
-# my-navigator
-
-
-
 # 🧭 [My Navigator](https://htean.github.io/my-navigator/)
 
 **Personal Navigation Homepage** Save, organize, or share your favorite websites from anywhere.
