@@ -64,8 +64,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 #sites-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:14px}
 .site-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 14px 14px;display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer;transition:all .18s;position:relative;user-select:none}
 .site-card:hover{box-shadow:var(--shadow-md);border-color:var(--border-strong);transform:translateY(-2px)}
-.site-card.dragging{opacity:.4;transform:scale(.97)}
-.site-card.drag-over{border:2px solid var(--accent);background:var(--accent-bg)}
+.site-card.dragging{opacity:.35;transform:scale(.96)}
+.site-card.drop-before{box-shadow:-3px 0 0 0 var(--accent)}
+.site-card.drop-after{box-shadow:3px 0 0 0 var(--accent)}
 .site-logo{width:52px;height:52px;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--accent-bg);color:var(--accent);font-size:22px;font-weight:700;flex-shrink:0;border:1px solid var(--border)}
 .site-logo img{width:100%;height:100%;object-fit:contain;display:block}
 .site-name{font-size:13px;font-weight:500;text-align:center;word-break:break-word;line-height:1.35;color:var(--text)}
@@ -524,31 +525,44 @@ function renderMain(){
 
 function setupSiteDrag(grid,visibleList){
   let dragSrc=null;
+  function clearIndicators(){grid.querySelectorAll('.site-card').forEach(x=>{x.classList.remove('drop-before','drop-after');});}
+
   grid.querySelectorAll('.site-card[draggable=true]').forEach(el=>{
     el.addEventListener('dragstart',e=>{
-      dragSrc=el;el.classList.add('dragging');
+      dragSrc=el;
+      setTimeout(()=>el.classList.add('dragging'),0);
       e.dataTransfer.effectAllowed='move';
     });
     el.addEventListener('dragend',()=>{
       el.classList.remove('dragging');
-      grid.querySelectorAll('.site-card').forEach(x=>x.classList.remove('drag-over'));
+      clearIndicators();
+      dragSrc=null;
     });
     el.addEventListener('dragover',e=>{
       e.preventDefault();e.dataTransfer.dropEffect='move';
-      grid.querySelectorAll('.site-card').forEach(x=>x.classList.remove('drag-over'));
-      if(el!==dragSrc)el.classList.add('drag-over');
+      if(!dragSrc||el===dragSrc)return;
+      clearIndicators();
+      // Determine if cursor is on left or right half of the card
+      const rect=el.getBoundingClientRect();
+      const midX=rect.left+rect.width/2;
+      if(e.clientX<midX) el.classList.add('drop-before');
+      else el.classList.add('drop-after');
     });
+    el.addEventListener('dragleave',()=>clearIndicators());
     el.addEventListener('drop',e=>{
       e.preventDefault();
       if(!dragSrc||dragSrc===el)return;
-      el.classList.remove('drag-over');
+      const insertBefore=el.classList.contains('drop-before');
+      clearIndicators();
       const srcId=dragSrc.dataset.id;
       const tgtId=el.dataset.id;
       const srcIdx=sites.findIndex(s=>s.id===srcId);
-      const tgtIdx=sites.findIndex(s=>s.id===tgtId);
+      let tgtIdx=sites.findIndex(s=>s.id===tgtId);
       if(srcIdx<0||tgtIdx<0)return;
       const[moved]=sites.splice(srcIdx,1);
-      sites.splice(tgtIdx,0,moved);
+      // Recalculate tgtIdx after splice
+      tgtIdx=sites.findIndex(s=>s.id===tgtId);
+      sites.splice(insertBefore?tgtIdx:tgtIdx+1,0,moved);
       render();
       saveSiteOrder();
       toast('Order saved');
