@@ -9,6 +9,7 @@
 
 ## What it does
 
+| | |
 | 🌐 **Save any website** | Add a URL and it auto-fetches the logo |
 | 📁 **Organize into folders** | Create categories like AI, Shopping, Work |
 | 🔍 **Search everything** | Find sites by name, description, or category |
