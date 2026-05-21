@@ -744,9 +744,35 @@ function showAuthModal(mode='signin'){
       if(pass.length<6){showAuthError('Password must be at least 6 characters.');return;}
     }
     const btn=document.getElementById('a-submit');btn.textContent='Please wait…';btn.disabled=true;
-    const{error}=isSignin?await sb.auth.signInWithPassword({email,password:pass}):await sb.auth.signUp({email,password:pass});
-    if(error){showAuthError(error.message);btn.textContent=isSignin?'Sign in':'Create account';btn.disabled=false;}
-    else if(!isSignin){showAuthError('✅ Check your email to confirm your account, then sign in.',true);btn.textContent='Create account';btn.disabled=false;}
+    try{
+      if(isSignin){
+        const{data,error}=await sb.auth.signInWithPassword({email,password:pass});
+        console.log('SIGNIN result:',{data,error});
+        if(error){showAuthError(error.message);btn.textContent='Sign in';btn.disabled=false;}
+      } else {
+        const{data,error}=await sb.auth.signUp({email,password:pass});
+        console.log('SIGNUP result:',{data,error});
+        if(error){
+          showAuthError(error.message);
+          btn.textContent='Create account';btn.disabled=false;
+        } else if(data?.user){
+          if(data.user.identities&&data.user.identities.length===0){
+            showAuthError('This email is already registered. Please sign in instead.');
+            btn.textContent='Create account';btn.disabled=false;
+          } else {
+            showAuthError('✅ Account created! Check your email to confirm, then sign in.',true);
+            btn.textContent='Create account';btn.disabled=false;
+          }
+        } else {
+          showAuthError('Something unexpected happened. Check the browser console (F12) for details.');
+          btn.textContent='Create account';btn.disabled=false;
+        }
+      }
+    }catch(e){
+      console.error('Auth exception:',e);
+      showAuthError('Error: '+e.message);
+      btn.textContent=isSignin?'Sign in':'Create account';btn.disabled=false;
+    }
   };
   document.getElementById('a-pass').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('a-submit').click();});
   document.getElementById('a-email').focus();
