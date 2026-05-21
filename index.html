@@ -272,6 +272,7 @@ async function loadData(){
     sb.from('profiles').select('*').eq('id',user.id).single(),
   ]);
   folders=f||[];sites=s||[];isPublic=p?.is_public||false;
+  if(!p)await sb.from('profiles').insert({id:user.id,is_public:false});
 }
 
 async function loadSharedData(userId){
@@ -745,10 +746,12 @@ function showAuthModal(mode='signin'){
     const btn=document.getElementById('a-submit');btn.textContent='Please wait…';btn.disabled=true;
     try{
       if(isSignin){
-        const{error}=await sb.auth.signInWithPassword({email,password:pass});
+        const{data,error}=await sb.auth.signInWithPassword({email,password:pass});
+        console.log('SIGNIN result:',{data,error});
         if(error){showAuthError(error.message);btn.textContent='Sign in';btn.disabled=false;}
       } else {
         const{data,error}=await sb.auth.signUp({email,password:pass});
+        console.log('SIGNUP result:',{data,error});
         if(error){
           showAuthError(error.message);
           btn.textContent='Create account';btn.disabled=false;
@@ -760,9 +763,13 @@ function showAuthModal(mode='signin'){
             showAuthError('✅ Account created! Check your email to confirm, then sign in.',true);
             btn.textContent='Create account';btn.disabled=false;
           }
+        } else {
+          showAuthError('Something unexpected happened. Check the browser console (F12) for details.');
+          btn.textContent='Create account';btn.disabled=false;
         }
       }
     }catch(e){
+      console.error('Auth exception:',e);
       showAuthError('Error: '+e.message);
       btn.textContent=isSignin?'Sign in':'Create account';btn.disabled=false;
     }
