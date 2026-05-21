@@ -131,16 +131,40 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .share-url{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 13px;font-size:12px;font-family:'DM Mono',monospace;word-break:break-all;color:var(--text-muted);margin-top:10px}
 .g-ico{width:18px;height:18px;flex-shrink:0}
 .gh-ico{width:18px;height:18px;fill:currentColor;flex-shrink:0}
+#sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:90}
+#menu-btn{display:none;background:none;border:none;cursor:pointer;font-size:22px;padding:4px;color:var(--text);flex-shrink:0}
+@media(max-width:768px){
+  #menu-btn{display:flex;align-items:center}
+  #sidebar{transform:translateX(-100%);transition:transform .25s ease;z-index:95}
+  #sidebar.open{transform:translateX(0)}
+  #sidebar-overlay.open{display:block}
+  #main{margin-left:0!important;padding:16px}
+  #search-wrap{max-width:none}
+  #sites-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px}
+  .site-card{padding:14px 10px 10px}
+  .site-logo{width:42px;height:42px}
+  .site-name{font-size:12px}
+  #topbar{padding:0 12px;gap:8px}
+  .logo{font-size:15px}
+  #guest-banner{flex-direction:column;align-items:flex-start}
+  .topbar-right .btn-ghost{display:none}
+  .overlay{align-items:flex-end;padding:0}
+  .modal{max-width:100%;border-radius:16px 16px 0 0;margin:0;position:relative;max-height:92vh;overflow-y:auto}
+  .card-menu{opacity:1}
+  .drag-hint{display:none}
+}
 </style>
 </head>
 <body>
 <div id="loading"><div class="spinner"></div></div>
+<div id="sidebar-overlay" id="sidebar-overlay"></div>
 <div id="topbar">
+  <button id="menu-btn">☰</button>
   <div class="logo"><div class="logo-dot"></div>Navigator</div>
-  <div id="search-wrap"><span class="search-ico">🔍</span><input type="text" id="search-input" placeholder="Search sites, categories, descriptions…" autocomplete="off"/></div>
+  <div id="search-wrap"><span class="search-ico">🔍</span><input type="text" id="search-input" placeholder="Search…" autocomplete="off"/></div>
   <div class="topbar-right">
     <button class="btn btn-sm btn-ghost" id="share-btn" style="display:none">🔗 Share</button>
-    <button class="btn btn-sm btn-primary" id="add-site-btn" style="display:none">+ Add Site</button>
+    <button class="btn btn-sm btn-primary" id="add-site-btn" style="display:none">+ Add</button>
     <div id="auth-area"></div>
   </div>
 </div>
@@ -272,7 +296,7 @@ async function loadData(){
     sb.from('profiles').select('*').eq('id',user.id).single(),
   ]);
   folders=f||[];sites=s||[];isPublic=p?.is_public||false;
-  if(!p)await sb.from('profiles').insert({id:user.id,is_public:false});
+  if(!p){await sb.from('profiles').upsert({id:user.id,is_public:false},{onConflict:'id'});}
 }
 
 async function loadSharedData(userId){
@@ -416,7 +440,7 @@ function renderSidebar(){
   list.querySelectorAll('.folder-item').forEach(el=>{
     el.addEventListener('click',e=>{
       if(e.target.closest('[data-rename],[data-del-folder],.drag-handle'))return;
-      activeFolder=el.dataset.folder;searchQuery='';document.getElementById('search-input').value='';render();
+      activeFolder=el.dataset.folder;searchQuery='';document.getElementById('search-input').value='';closeSidebarMobile();render();
     });
   });
   if(!isReadOnly){
@@ -746,30 +770,21 @@ function showAuthModal(mode='signin'){
     const btn=document.getElementById('a-submit');btn.textContent='Please wait…';btn.disabled=true;
     try{
       if(isSignin){
-        const{data,error}=await sb.auth.signInWithPassword({email,password:pass});
-        console.log('SIGNIN result:',{data,error});
+        const{error}=await sb.auth.signInWithPassword({email,password:pass});
         if(error){showAuthError(error.message);btn.textContent='Sign in';btn.disabled=false;}
       } else {
         const{data,error}=await sb.auth.signUp({email,password:pass});
-        console.log('SIGNUP result:',{data,error});
+        btn.textContent='Create account';btn.disabled=false;
         if(error){
           showAuthError(error.message);
-          btn.textContent='Create account';btn.disabled=false;
-        } else if(data?.user){
-          if(data.user.identities&&data.user.identities.length===0){
-            showAuthError('This email is already registered. Please sign in instead.');
-            btn.textContent='Create account';btn.disabled=false;
-          } else {
-            showAuthError('✅ Account created! Check your email to confirm, then sign in.',true);
-            btn.textContent='Create account';btn.disabled=false;
-          }
+        } else if(!data?.user){
+          // user null = email already registered (Supabase silent duplicate)
+          showAuthError('This email is already registered. Please sign in instead.');
         } else {
-          showAuthError('Something unexpected happened. Check the browser console (F12) for details.');
-          btn.textContent='Create account';btn.disabled=false;
+          showAuthError('✅ Account created! Check your email to confirm, then sign in.',true);
         }
       }
     }catch(e){
-      console.error('Auth exception:',e);
       showAuthError('Error: '+e.message);
       btn.textContent=isSignin?'Sign in':'Create account';btn.disabled=false;
     }
@@ -797,6 +812,24 @@ function showUserMenu(){
   document.getElementById('signout-btn').onclick=()=>sb.auth.signOut();
 }
 document.addEventListener('click',()=>{if(userMenu){userMenu.remove();userMenu=null;}});
+
+// ── MOBILE MENU ───────────────────────────────────────────────────────────
+document.getElementById('menu-btn').onclick=e=>{
+  e.stopPropagation();
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('open');
+};
+document.getElementById('sidebar-overlay').onclick=()=>{
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+};
+// Close sidebar on folder select on mobile
+function closeSidebarMobile(){
+  if(window.innerWidth<=768){
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebar-overlay').classList.remove('open');
+  }
+}
 
 // ── SEARCH & TOPBAR ───────────────────────────────────────────────────────
 document.getElementById('search-input').addEventListener('input',e=>{searchQuery=e.target.value;render();});
