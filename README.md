@@ -6,8 +6,8 @@
 
 **Personal Navigation Homepage** Save, organize, or share your favorite websites from anywhere.
 
-> URL: https://htean.github.io/my-navigator/
-> Bookmark manager · Personal dashboard · Start page · Link organizer
+> **URL:** https://htean.github.io/my-navigator/  
+> **Bookmark manager · Personal dashboard · Start page · Link organizer**
 
 ---
 
