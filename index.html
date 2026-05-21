@@ -8,7 +8,7 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#f7f6f3;--surface:#ffffff;--border:#e8e6e1;--border-strong:#d0cdc6;
+  --bg:#f7f6f3;--surface:#fff;--border:#e8e6e1;--border-strong:#d0cdc6;
   --text:#1c1b18;--text-muted:#8a8780;--text-light:#b5b2ac;
   --accent:#2563eb;--accent-bg:#eff6ff;--accent-muted:#bfdbfe;
   --danger:#dc2626;--warn-bg:#fffbeb;--warn-border:#fcd34d;--warn-text:#92400e;
@@ -17,8 +17,6 @@
   --shadow:0 1px 3px rgba(0,0,0,.06);--shadow-md:0 4px 16px rgba(0,0,0,.08);
 }
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;font-size:15px}
-
-/* TOPBAR */
 #topbar{position:fixed;top:0;left:0;right:0;height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:0 20px;z-index:100}
 .logo{font-weight:600;font-size:17px;color:var(--text);white-space:nowrap;display:flex;align-items:center;gap:8px;margin-right:4px}
 .logo-dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
@@ -35,48 +33,39 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .btn-sm{padding:6px 12px;font-size:12px}
 .btn-ghost{border-color:transparent;background:transparent}
 .btn-ghost:hover{background:var(--bg);border-color:var(--border)}
-.btn-danger{background:var(--danger);color:#fff;border-color:var(--danger)}
 .avatar{width:32px;height:32px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;cursor:pointer;flex-shrink:0;overflow:hidden}
 .avatar img{width:100%;height:100%;object-fit:cover}
-
-/* LAYOUT */
 #layout{display:flex;margin-top:var(--topbar-h);min-height:calc(100vh - var(--topbar-h))}
-
-/* SIDEBAR */
 #sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;position:fixed;top:var(--topbar-h);bottom:0;overflow-y:auto}
 .sidebar-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-light);padding:0 18px;margin:16px 0 6px}
-.folder-item{display:flex;align-items:center;gap:10px;padding:9px 18px;cursor:pointer;font-size:14px;transition:background .12s;position:relative;color:var(--text-muted)}
+.folder-item{display:flex;align-items:center;gap:10px;padding:9px 18px;cursor:pointer;font-size:14px;transition:background .12s;position:relative;color:var(--text-muted);user-select:none}
 .folder-item:hover{background:var(--bg);color:var(--text)}
 .folder-item.active{background:var(--accent-bg);color:var(--accent);font-weight:500}
+.folder-item.dragging{opacity:.4}
+.folder-item.drag-over{border-top:2px solid var(--accent)}
 .fi-icon{font-size:16px;flex-shrink:0}.fi-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fi-count{font-size:11px;font-family:'DM Mono',monospace;background:var(--bg);color:var(--text-light);padding:1px 7px;border-radius:10px;border:1px solid var(--border)}
 .folder-item.active .fi-count{background:var(--accent-muted);color:var(--accent);border-color:var(--accent-muted)}
 .folder-actions{display:none;gap:2px}.folder-item:hover .folder-actions{display:flex}
+.drag-handle{cursor:grab;color:var(--text-light);font-size:14px;padding:0 2px;display:none}
+.folder-item:hover .drag-handle{display:block}
 .ico-btn{width:22px;height:22px;border-radius:5px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--text-muted);transition:background .12s}
 .ico-btn:hover{background:var(--border);color:var(--text)}
 #add-folder-btn{display:flex;align-items:center;gap:10px;width:100%;padding:9px 18px;font-size:14px;color:var(--text-light);border:none;background:transparent;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .12s}
 #add-folder-btn:hover{background:var(--bg);color:var(--text-muted)}
-
-/* MAIN */
 #main{margin-left:var(--sidebar-w);flex:1;padding:28px 28px 40px}
 .page-header{display:flex;align-items:center;gap:10px;margin-bottom:16px}
 .page-title{font-size:20px;font-weight:600;color:var(--text)}
 .public-badge{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:500;background:#dcfce7;color:#15803d;border:1px solid #bbf7d0}
-
-/* GUEST BANNER */
-#guest-banner{
-  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
-  background:var(--warn-bg);border:1px solid var(--warn-border);
-  border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:20px;
-  font-size:13px;color:var(--warn-text);
-}
+.viewing-badge{font-size:12px;padding:4px 10px;border-radius:20px;background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-muted)}
+#guest-banner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;background:var(--warn-bg);border:1px solid var(--warn-border);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:20px;font-size:13px;color:var(--warn-text)}
 #guest-banner strong{font-weight:600}
 .banner-actions{display:flex;gap:8px;flex-shrink:0}
-
-/* GRID */
 #sites-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:14px}
-.site-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 14px 14px;display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer;transition:all .18s;position:relative}
+.site-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 14px 14px;display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer;transition:all .18s;position:relative;user-select:none}
 .site-card:hover{box-shadow:var(--shadow-md);border-color:var(--border-strong);transform:translateY(-2px)}
+.site-card.dragging{opacity:.4;transform:scale(.97)}
+.site-card.drag-over{border:2px solid var(--accent);background:var(--accent-bg)}
 .site-logo{width:52px;height:52px;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--accent-bg);color:var(--accent);font-size:22px;font-weight:700;flex-shrink:0;border:1px solid var(--border)}
 .site-logo img{width:100%;height:100%;object-fit:contain;display:block}
 .site-name{font-size:13px;font-weight:500;text-align:center;word-break:break-word;line-height:1.35;color:var(--text)}
@@ -84,6 +73,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .site-host{font-size:10px;font-family:'DM Mono',monospace;color:var(--text-light);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
 .card-menu{position:absolute;top:8px;right:8px;opacity:0;background:var(--surface);border:1px solid var(--border);border-radius:6px;width:24px;height:24px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);transition:opacity .15s;box-shadow:var(--shadow)}
 .site-card:hover .card-menu{opacity:1}
+.drag-hint{font-size:10px;color:var(--text-light);position:absolute;top:6px;left:8px;opacity:0;transition:opacity .15s}
+.site-card:hover .drag-hint{opacity:1}
 .add-card{background:transparent;border:2px dashed var(--border);border-radius:var(--radius);padding:18px 14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;min-height:130px;color:var(--text-light);font-size:13px;font-weight:500;transition:all .18s}
 .add-card:hover{border-color:var(--accent);background:var(--accent-bg);color:var(--accent)}
 .plus-ring{width:38px;height:38px;border-radius:50%;border:2px dashed currentColor;display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;transition:transform .18s}
@@ -92,8 +83,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .empty-icon{font-size:44px;opacity:.5}
 .empty-state p{font-size:15px;color:var(--text-muted)}
 .search-banner{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--accent-bg);border:1px solid var(--accent-muted);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:18px;font-size:13px;color:var(--accent)}
-
-/* MODAL */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(2px);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px}
 .modal{background:var(--surface);border-radius:16px;width:100%;max-width:460px;box-shadow:0 24px 64px rgba(0,0,0,.16);animation:popIn .2s cubic-bezier(.34,1.56,.64,1);border:1px solid var(--border)}
 @keyframes popIn{from{opacity:0;transform:scale(.94) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
@@ -112,13 +101,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .url-row .field{flex:1;margin-bottom:0}
 #fav-preview{width:44px;height:44px;border-radius:10px;border:1px solid var(--border);background:var(--accent-bg);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;overflow:hidden}
 #fav-preview img{width:100%;height:100%;object-fit:contain}
-
-/* AUTH MODAL */
-.auth-modal{max-width:400px}
-.auth-title{font-size:22px;font-weight:600;margin-bottom:6px}
-.auth-sub{font-size:14px;color:var(--text-muted);margin-bottom:24px;line-height:1.6}
 .social-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:11px 16px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'DM Sans',sans-serif;transition:all .15s;margin-bottom:10px}
-.social-btn:hover{background:var(--bg);border-color:var(--border-strong)}
+.social-btn:hover{background:var(--bg)}
 .social-btn.github{background:#24292e;color:#fff;border-color:#24292e}
 .social-btn.github:hover{background:#1a1f23}
 .social-btn.google{background:#fff;border-color:#e0e0e0}
@@ -126,72 +110,53 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--text-light);font-size:12px}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
 .auth-toggle{text-align:center;font-size:13px;color:var(--text-muted);margin-top:16px}
-.auth-toggle a{color:var(--accent);cursor:pointer;text-decoration:none}
-.auth-toggle a:hover{text-decoration:underline}
+.auth-toggle a{color:var(--accent);cursor:pointer}
 .auth-error{background:#fef2f2;border:1px solid #fecaca;border-radius:var(--radius-sm);padding:10px 13px;font-size:13px;color:var(--danger);margin-bottom:14px;display:none}
-
-/* UNSAVED WARN */
 .unsaved-warn{background:var(--warn-bg);border:1px solid var(--warn-border);border-radius:var(--radius-sm);padding:12px 14px;font-size:13px;color:var(--warn-text);margin-bottom:16px;display:flex;align-items:flex-start;gap:10px}
-.unsaved-warn .warn-icon{font-size:16px;flex-shrink:0;margin-top:1px}
-
-/* CTX MENU */
 .ctx{position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md);z-index:300;min-width:168px;overflow:hidden;animation:ctxPop .12s ease}
 @keyframes ctxPop{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
 .ctx-item{display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:13px;cursor:pointer;transition:background .1s}
 .ctx-item:hover{background:var(--bg)}
 .ctx-item.danger{color:var(--danger)}
 .ctx-sep{height:1px;background:var(--border);margin:4px 0}
-
-/* USER MENU */
 .user-menu{position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md);z-index:300;min-width:200px;overflow:hidden;animation:ctxPop .12s ease}
 .user-info{padding:14px;border-bottom:1px solid var(--border)}
 .u-name{font-weight:500;font-size:14px}.u-email{font-size:12px;color:var(--text-muted);margin-top:2px}
-
-/* LOADING */
 #loading{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:400}
 .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* TOAST */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1c1b18;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;z-index:999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none}
 .toast.show{transform:translateX(-50%) translateY(0)}
 .share-url{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 13px;font-size:12px;font-family:'DM Mono',monospace;word-break:break-all;color:var(--text-muted);margin-top:10px}
-
-/* Google icon SVG */
 .g-ico{width:18px;height:18px;flex-shrink:0}
 .gh-ico{width:18px;height:18px;fill:currentColor;flex-shrink:0}
 </style>
 </head>
 <body>
-
 <div id="loading"><div class="spinner"></div></div>
-
 <div id="topbar">
   <div class="logo"><div class="logo-dot"></div>Navigator</div>
-  <div id="search-wrap">
-    <span class="search-ico">🔍</span>
-    <input type="text" id="search-input" placeholder="Search sites, categories, descriptions…" autocomplete="off"/>
-  </div>
+  <div id="search-wrap"><span class="search-ico">🔍</span><input type="text" id="search-input" placeholder="Search sites, categories, descriptions…" autocomplete="off"/></div>
   <div class="topbar-right">
     <button class="btn btn-sm btn-ghost" id="share-btn" style="display:none">🔗 Share</button>
-    <button class="btn btn-sm btn-primary" id="add-site-btn">+ Add Site</button>
+    <button class="btn btn-sm btn-primary" id="add-site-btn" style="display:none">+ Add Site</button>
     <div id="auth-area"></div>
   </div>
 </div>
-
 <div id="layout">
   <div id="sidebar">
     <div class="sidebar-label">Categories</div>
     <div id="folder-list"></div>
-    <button id="add-folder-btn">＋ &nbsp;New Category</button>
+    <button id="add-folder-btn" style="display:none">＋ &nbsp;New Category</button>
   </div>
   <div id="main">
     <div class="page-header">
       <div class="page-title" id="page-title">All Sites</div>
       <span id="public-badge" style="display:none" class="public-badge">Public</span>
+      <span id="viewing-badge" style="display:none" class="viewing-badge">👀 Viewing shared page</span>
     </div>
     <div id="guest-banner" style="display:none">
-      <div><strong>👋 You're browsing as a guest.</strong> Any sites or categories you add won't be saved when you leave. Sign in to keep your data across all devices.</div>
+      <div><strong>👋 You're browsing as a guest.</strong> Any changes won't be saved. Sign in to keep your data across all devices.</div>
       <div class="banner-actions">
         <button class="btn btn-sm" id="banner-signin-btn">Sign in</button>
         <button class="btn btn-sm btn-primary" id="banner-signup-btn">Create account</button>
@@ -201,7 +166,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div id="sites-grid"></div>
   </div>
 </div>
-
 <div id="modal-root"></div>
 <div class="toast" id="toast"></div>
 
@@ -211,242 +175,201 @@ const SUPABASE_URL='https://vhljeqeqedtrqspevidm.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZobGplcWVxZWR0cnFzcGV2aWRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzk3NDEsImV4cCI6MjA5NDk1NTc0MX0.TcUhUJFSsYMrbIYh7yh9Zb1bkVzCa5Eys7Koddo3G9o';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-// ── STATE ──────────────────────────────────────────────────────────────────
 let user=null;
-// For guests, data lives only in memory
 let folders=[],sites=[],isPublic=false,activeFolder='all',searchQuery='';
+let viewingUserId=null; // set when viewing someone else's shared page
+let isReadOnly=false;
 
-// ── INIT ───────────────────────────────────────────────────────────────────
+// ── INIT ──────────────────────────────────────────────────────────────────
 async function init(){
-  // Handle OAuth redirect: Supabase puts tokens in the URL hash
+  // Handle OAuth redirect
   if(window.location.hash&&window.location.hash.includes('access_token')){
-    // Let Supabase parse the hash and establish the session
     await sb.auth.getSession();
-    // Clean up the URL
     history.replaceState(null,'',window.location.pathname);
   }
 
+  // Check if viewing a shared page (?user=UUID)
+  const params=new URLSearchParams(window.location.search);
+  const sharedUserId=params.get('user');
+
   const{data:{session}}=await sb.auth.getSession();
-  if(session){user=session.user;await loadData();}
+  if(session){user=session.user;}
+
+  if(sharedUserId && sharedUserId!==user?.id){
+    // Viewing someone else's page — load their public data
+    viewingUserId=sharedUserId;
+    isReadOnly=true;
+    await loadSharedData(sharedUserId);
+  } else {
+    viewingUserId=null;
+    isReadOnly=false;
+    if(user) await loadData();
+  }
+
   showApp();
 
   sb.auth.onAuthStateChange(async(event,session)=>{
     if((event==='SIGNED_IN'||event==='TOKEN_REFRESHED')&&session&&(!user||user.id!==session.user.id)){
       const gFolders=[...folders],gSites=[...sites];
       user=session.user;
-      await loadData();
-      closeModal();
-      showApp();
-      // offer to import guest data
-      if(gSites.length>0&&confirm(`You had ${gSites.length} site(s) added as guest. Import them into your account?`)){
-        for(const f of gFolders){
-          const{data:nf}=await sb.from('folders').insert({user_id:user.id,name:f.name}).select().single();
-          if(nf)gSites.forEach(s=>{if(s.folder_id===f.id)s.folder_id=nf.id;});
-        }
-        for(const s of gSites){
-          await sb.from('sites').insert({user_id:user.id,url:s.url,name:s.name,description:s.description,folder_id:s.folder_id||null});
-        }
+      // If was viewing shared page, keep viewing it but now logged in
+      if(!isReadOnly){
         await loadData();
-        render();
+        closeModal();
+        showApp();
+        if(gSites.length>0&&confirm(`Import ${gSites.length} guest site(s) into your account?`)){
+          for(const f of gFolders){
+            const{data:nf}=await sb.from('folders').insert({user_id:user.id,name:f.name,order_index:f.order_index||0}).select().single();
+            if(nf)gSites.forEach(s=>{if(s.folder_id===f.id)s.folder_id=nf.id;});
+          }
+          for(const s of gSites){
+            await sb.from('sites').insert({user_id:user.id,url:s.url,name:s.name,description:s.description,folder_id:s.folder_id||null,order_index:s.order_index||0});
+          }
+          await loadData();render();
+        }
+      } else {
+        closeModal();renderAuthArea();
       }
     } else if(event==='SIGNED_OUT'){
-      user=null;folders=[];sites=[];isPublic=false;showApp();
+      user=null;
+      if(!isReadOnly){folders=[];sites=[];isPublic=false;}
+      showApp();
     }
   });
 }
 
 function showApp(){
   document.getElementById('loading').style.display='none';
-  document.getElementById('layout').style.marginTop='';
   renderAuthArea();
+  // Show/hide edit controls based on read-only
+  document.getElementById('add-site-btn').style.display=isReadOnly?'none':'inline-flex';
+  document.getElementById('add-folder-btn').style.display=isReadOnly?'none':'block';
+  document.getElementById('share-btn').style.display=(user&&!isReadOnly)?'inline-flex':'none';
   render();
 }
 
-// ── AUTH AREA (top right) ──────────────────────────────────────────────────
+// ── AUTH AREA ─────────────────────────────────────────────────────────────
 function renderAuthArea(){
   const area=document.getElementById('auth-area');
-  const shareBtn=document.getElementById('share-btn');
   if(user){
-    shareBtn.style.display='inline-flex';
     const meta=user.user_metadata||{};
-    const name=(meta.full_name||meta.user_name||user.email||'U');
-    const avatarContent=meta.avatar_url
-      ?`<img src="${meta.avatar_url}" alt=""/>`
-      :name[0].toUpperCase();
-    area.innerHTML=`<div class="avatar" id="avatar-btn">${avatarContent}</div>`;
+    area.innerHTML=`<div class="avatar" id="avatar-btn">${meta.avatar_url?`<img src="${meta.avatar_url}" alt=""/>`:(meta.full_name||meta.user_name||user.email||'U')[0].toUpperCase()}</div>`;
     document.getElementById('avatar-btn').onclick=e=>{e.stopPropagation();showUserMenu();};
   } else {
-    shareBtn.style.display='none';
-    area.innerHTML=`
-      <button class="btn btn-sm btn-ghost" id="topbar-signin">Sign in</button>
-      <button class="btn btn-sm btn-primary" id="topbar-signup">Sign up</button>`;
+    area.innerHTML=`<button class="btn btn-sm btn-ghost" id="topbar-signin">Sign in</button><button class="btn btn-sm btn-primary" id="topbar-signup">Sign up</button>`;
     document.getElementById('topbar-signin').onclick=()=>showAuthModal('signin');
     document.getElementById('topbar-signup').onclick=()=>showAuthModal('signup');
   }
 }
 
-// ── AUTH MODAL ─────────────────────────────────────────────────────────────
-function showAuthModal(mode='signin'){
-  const isSignin=mode==='signin';
-  openModal(`
-    <div class="modal-head" style="padding-bottom:18px">
-      <div>
-        <div class="auth-title">${isSignin?'Welcome back':'Create account'}</div>
-        <div class="auth-sub">${isSignin?'Sign in to sync your navigator across all devices.':'Sign up free — your data stays private and syncs everywhere.'}</div>
-      </div>
-      <button class="btn btn-ghost btn-sm" id="mc" style="align-self:flex-start">✕</button>
-    </div>
-    <div class="modal-body" style="padding-top:0">
-      <button class="social-btn github" id="gh-btn">
-        <svg class="gh-ico" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
-        Continue with GitHub
-      </button>
-      <button class="social-btn google" id="gg-btn">
-        <svg class="g-ico" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-        Continue with Google
-      </button>
-      <div class="divider">or ${isSignin?'sign in':'sign up'} with email</div>
-      <div class="auth-error" id="auth-err"></div>
-      <div class="field"><label>Email</label><input type="email" id="a-email" placeholder="you@example.com" autocomplete="email"/></div>
-      <div class="field"><label>Password</label><input type="password" id="a-pass" placeholder="${isSignin?'Your password':'At least 6 characters'}" autocomplete="${isSignin?'current-password':'new-password'}"/></div>
-      ${!isSignin?`<div class="field"><label>Confirm Password</label><input type="password" id="a-pass2" placeholder="Repeat password" autocomplete="new-password"/></div>`:''}
-      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:11px" id="a-submit">${isSignin?'Sign in':'Create account'}</button>
-      <div class="auth-toggle">
-        ${isSignin
-          ?`Don't have an account? <a id="a-switch">Sign up free</a>`
-          :`Already have an account? <a id="a-switch">Sign in</a>`}
-      </div>
-    </div>
-  `,'auth-modal');
-
-  document.getElementById('mc').onclick=closeModal;
-  document.getElementById('gh-btn').onclick=()=>sb.auth.signInWithOAuth({provider:'github',options:{redirectTo:window.location.href}});
-  document.getElementById('gg-btn').onclick=()=>sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.href}});
-  document.getElementById('a-switch').onclick=()=>showAuthModal(isSignin?'signup':'signin');
-
-  document.getElementById('a-submit').onclick=async()=>{
-    const email=document.getElementById('a-email').value.trim();
-    const pass=document.getElementById('a-pass').value;
-    const errEl=document.getElementById('auth-err');
-    errEl.style.display='none';
-    if(!email||!pass){showAuthError('Please fill in all fields.');return;}
-    if(!isSignin){
-      const pass2=document.getElementById('a-pass2').value;
-      if(pass!==pass2){showAuthError('Passwords do not match.');return;}
-      if(pass.length<6){showAuthError('Password must be at least 6 characters.');return;}
-    }
-    const btn=document.getElementById('a-submit');
-    btn.textContent='Please wait…';btn.disabled=true;
-    const{error}=isSignin
-      ?await sb.auth.signInWithPassword({email,password:pass})
-      :await sb.auth.signUp({email,password:pass});
-    if(error){
-      showAuthError(error.message);
-      btn.textContent=isSignin?'Sign in':'Create account';btn.disabled=false;
-    } else if(!isSignin){
-      showAuthError('✅ Check your email to confirm your account, then sign in.',true);
-      btn.textContent='Create account';btn.disabled=false;
-    }
-  };
-
-  // enter key
-  document.getElementById('a-pass').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('a-submit').click();});
-  document.getElementById('a-email').focus();
-}
-
-function showAuthError(msg,success=false){
-  const el=document.getElementById('auth-err');
-  if(!el)return;
-  el.textContent=msg;
-  el.style.display='block';
-  if(success){el.style.background='#f0fdf4';el.style.borderColor='#86efac';el.style.color='#166534';}
-}
-
-// ── GUEST BANNER ──────────────────────────────────────────────────────────
-function renderGuestBanner(){
-  const banner=document.getElementById('guest-banner');
-  if(!user){
-    banner.style.display='flex';
-    document.getElementById('banner-signin-btn').onclick=()=>showAuthModal('signin');
-    document.getElementById('banner-signup-btn').onclick=()=>showAuthModal('signup');
-  } else {
-    banner.style.display='none';
-  }
-}
-
-// ── DATA ──────────────────────────────────────────────────────────────────
+// ── LOAD DATA ─────────────────────────────────────────────────────────────
 async function loadData(){
   if(!user)return;
   const[{data:f},{data:s},{data:p}]=await Promise.all([
-    sb.from('folders').select('*').eq('user_id',user.id).order('created_at'),
-    sb.from('sites').select('*').eq('user_id',user.id).order('created_at'),
+    sb.from('folders').select('*').eq('user_id',user.id).order('order_index').order('created_at'),
+    sb.from('sites').select('*').eq('user_id',user.id).order('order_index').order('created_at'),
     sb.from('profiles').select('*').eq('id',user.id).single(),
   ]);
   folders=f||[];sites=s||[];isPublic=p?.is_public||false;
   if(!p)await sb.from('profiles').insert({id:user.id,is_public:false});
 }
 
-// Guest mode: data only in memory
-function guestAddFolder(name){
-  const f={id:'g_'+Date.now(),name};folders.push(f);render();toast('Category created (guest — not saved)');return f;
-}
-function guestAddSite(data){
-  const s={id:'g_'+Date.now(),...data};sites.push(s);render();toast('Site added (guest — not saved)');return s;
+async function loadSharedData(userId){
+  // Check if page is public
+  const{data:profile}=await sb.from('profiles').select('*').eq('id',userId).eq('is_public',true).single();
+  if(!profile){
+    folders=[];sites=[];
+    toast('This page is private or does not exist.');
+    return;
+  }
+  const[{data:f},{data:s}]=await Promise.all([
+    sb.from('folders').select('*').eq('user_id',userId).order('order_index').order('created_at'),
+    sb.from('sites').select('*').eq('user_id',userId).order('order_index').order('created_at'),
+  ]);
+  folders=f||[];sites=s||[];
 }
 
+// ── GUEST HELPERS ─────────────────────────────────────────────────────────
+function guestAddFolder(name){
+  const f={id:'g_'+Date.now(),name,order_index:folders.length};
+  folders.push(f);render();toast('Category created (guest — not saved)');return f;
+}
+function guestAddSite(data){
+  const s={id:'g_'+Date.now(),...data,order_index:sites.length};
+  sites.push(s);render();toast('Site added (guest — not saved)');return s;
+}
+
+// ── ENSURE SESSION ────────────────────────────────────────────────────────
 async function ensureSession(){
-  // Re-check session in case it was established after page load
   if(!user){
     const{data:{session}}=await sb.auth.getSession();
     if(session){user=session.user;await loadData();showApp();}
   }
   return!!user;
 }
+
+// ── DATA MUTATIONS ────────────────────────────────────────────────────────
 async function saveFolder(name){
+  if(isReadOnly)return;
   if(!(await ensureSession())){guestAddFolder(name);return;}
-  const{data,error}=await sb.from('folders').insert({user_id:user.id,name}).select().single();
-  if(error){toast('Error: '+error.message);console.error(error);return;}
+  const order_index=folders.length;
+  const{data,error}=await sb.from('folders').insert({user_id:user.id,name,order_index}).select().single();
+  if(error){toast('Error: '+error.message);return;}
   folders.push(data);render();toast('Category created');
 }
 async function updateFolder(id,name){
+  if(isReadOnly)return;
   if(!(await ensureSession())){folders.find(f=>f.id===id).name=name;render();return;}
-  const{error}=await sb.from('folders').update({name}).eq('id',id).eq('user_id',user.id);
-  if(error){toast('Error: '+error.message);return;}
+  await sb.from('folders').update({name}).eq('id',id).eq('user_id',user.id);
   folders.find(f=>f.id===id).name=name;render();toast('Category renamed');
 }
 async function deleteFolder(id){
+  if(isReadOnly)return;
   if(!(await ensureSession())){
-    folders=folders.filter(f=>f.id!==id);
-    sites.forEach(s=>{if(s.folder_id===id)s.folder_id=null;});
+    folders=folders.filter(f=>f.id!==id);sites.forEach(s=>{if(s.folder_id===id)s.folder_id=null;});
     if(activeFolder===id)activeFolder='all';render();return;
   }
   await sb.from('folders').delete().eq('id',id).eq('user_id',user.id);
-  folders=folders.filter(f=>f.id!==id);
-  sites.forEach(s=>{if(s.folder_id===id)s.folder_id=null;});
+  folders=folders.filter(f=>f.id!==id);sites.forEach(s=>{if(s.folder_id===id)s.folder_id=null;});
   if(activeFolder===id)activeFolder='all';render();toast('Category deleted');
 }
 async function saveSite(data){
+  if(isReadOnly)return;
   if(!(await ensureSession())){guestAddSite(data);return;}
-  const{data:row,error}=await sb.from('sites').insert({user_id:user.id,...data}).select().single();
+  const order_index=sites.filter(s=>s.folder_id===data.folder_id).length;
+  const{data:row,error}=await sb.from('sites').insert({user_id:user.id,...data,order_index}).select().single();
   if(error){toast('Error: '+error.message);console.error(error);return;}
   sites.push(row);render();toast('Site added');
 }
 async function updateSite(id,data){
+  if(isReadOnly)return;
   if(!(await ensureSession())){Object.assign(sites.find(s=>s.id===id),data);render();return;}
-  const{error}=await sb.from('sites').update(data).eq('id',id).eq('user_id',user.id);
-  if(error){toast('Error: '+error.message);return;}
+  await sb.from('sites').update(data).eq('id',id).eq('user_id',user.id);
   Object.assign(sites.find(s=>s.id===id),data);render();toast('Site updated');
 }
 async function deleteSite(id){
+  if(isReadOnly)return;
   if(!(await ensureSession())){sites=sites.filter(s=>s.id!==id);render();return;}
   await sb.from('sites').delete().eq('id',id).eq('user_id',user.id);
   sites=sites.filter(s=>s.id!==id);render();toast('Site removed');
 }
 async function togglePublic(){
-  if(!user)return;
+  if(!user||isReadOnly)return;
   isPublic=!isPublic;
   await sb.from('profiles').upsert({id:user.id,is_public:isPublic});
   render();toast(isPublic?'Page is now public':'Page is now private');
+}
+
+// ── REORDER: save new order_index for an array ────────────────────────────
+async function saveFolderOrder(){
+  if(!user||isReadOnly)return;
+  const updates=folders.map((f,i)=>sb.from('folders').update({order_index:i}).eq('id',f.id).eq('user_id',user.id));
+  await Promise.all(updates);
+}
+async function saveSiteOrder(){
+  if(!user||isReadOnly)return;
+  const updates=sites.map((s,i)=>sb.from('sites').update({order_index:i}).eq('id',s.id).eq('user_id',user.id));
+  await Promise.all(updates);
 }
 
 // ── HELPERS ───────────────────────────────────────────────────────────────
@@ -457,28 +380,89 @@ function initial(site){return(site.name||site.url||'?')[0].toUpperCase();}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
 
 // ── RENDER ────────────────────────────────────────────────────────────────
-function render(){renderGuestBanner();renderSidebar();renderMain();document.getElementById('public-badge').style.display=(user&&isPublic)?'inline-flex':'none';}
+function render(){
+  renderGuestBanner();renderSidebar();renderMain();
+  document.getElementById('public-badge').style.display=(user&&isPublic&&!isReadOnly)?'inline-flex':'none';
+  document.getElementById('viewing-badge').style.display=isReadOnly?'inline-flex':'none';
+}
 
+function renderGuestBanner(){
+  const banner=document.getElementById('guest-banner');
+  if(!user&&!isReadOnly){
+    banner.style.display='flex';
+    document.getElementById('banner-signin-btn').onclick=()=>showAuthModal('signin');
+    document.getElementById('banner-signup-btn').onclick=()=>showAuthModal('signup');
+  } else banner.style.display='none';
+}
+
+// ── SIDEBAR with drag-to-reorder ──────────────────────────────────────────
 function renderSidebar(){
   const list=document.getElementById('folder-list');
   let html=`<div class="folder-item ${activeFolder==='all'?'active':''}" data-folder="all"><span class="fi-icon">🏠</span><span class="fi-name">All Sites</span><span class="fi-count">${sites.length}</span></div>`;
   folders.forEach(f=>{
     const cnt=sites.filter(s=>s.folder_id===f.id).length;
-    html+=`<div class="folder-item ${activeFolder===f.id?'active':''}" data-folder="${f.id}"><span class="fi-icon">📁</span><span class="fi-name">${esc(f.name)}</span><span class="fi-count">${cnt}</span><div class="folder-actions"><button class="ico-btn" data-rename="${f.id}">✏️</button><button class="ico-btn" data-del-folder="${f.id}">🗑️</button></div></div>`;
+    html+=`<div class="folder-item ${activeFolder===f.id?'active':''}" data-folder="${f.id}" draggable="${!isReadOnly}">
+      ${!isReadOnly?`<span class="drag-handle" title="Drag to reorder">⠿</span>`:''}
+      <span class="fi-icon">📁</span>
+      <span class="fi-name">${esc(f.name)}</span>
+      <span class="fi-count">${cnt}</span>
+      ${!isReadOnly?`<div class="folder-actions"><button class="ico-btn" data-rename="${f.id}">✏️</button><button class="ico-btn" data-del-folder="${f.id}">🗑️</button></div>`:''}
+    </div>`;
   });
   list.innerHTML=html;
+
+  // folder click
   list.querySelectorAll('.folder-item').forEach(el=>{
     el.addEventListener('click',e=>{
-      if(e.target.closest('[data-rename],[data-del-folder]'))return;
+      if(e.target.closest('[data-rename],[data-del-folder],.drag-handle'))return;
       activeFolder=el.dataset.folder;searchQuery='';document.getElementById('search-input').value='';render();
     });
   });
-  list.querySelectorAll('[data-rename]').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();showRenameFolder(btn.dataset.rename);}));
-  list.querySelectorAll('[data-del-folder]').forEach(btn=>btn.addEventListener('click',e=>{
-    e.stopPropagation();if(confirm('Delete this category?'))deleteFolder(btn.dataset.delFolder);
-  }));
+  if(!isReadOnly){
+    list.querySelectorAll('[data-rename]').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();showRenameFolder(btn.dataset.rename);}));
+    list.querySelectorAll('[data-del-folder]').forEach(btn=>btn.addEventListener('click',e=>{
+      e.stopPropagation();if(confirm('Delete this category?'))deleteFolder(btn.dataset.delFolder);
+    }));
+    // drag reorder folders
+    setupFolderDrag(list);
+  }
 }
 
+function setupFolderDrag(list){
+  let dragSrc=null;
+  list.querySelectorAll('.folder-item[draggable=true]').forEach(el=>{
+    el.addEventListener('dragstart',e=>{
+      dragSrc=el;el.classList.add('dragging');
+      e.dataTransfer.effectAllowed='move';
+    });
+    el.addEventListener('dragend',()=>{
+      el.classList.remove('dragging');
+      list.querySelectorAll('.folder-item').forEach(x=>x.classList.remove('drag-over'));
+    });
+    el.addEventListener('dragover',e=>{
+      e.preventDefault();e.dataTransfer.dropEffect='move';
+      list.querySelectorAll('.folder-item').forEach(x=>x.classList.remove('drag-over'));
+      if(el!==dragSrc)el.classList.add('drag-over');
+    });
+    el.addEventListener('drop',e=>{
+      e.preventDefault();
+      if(!dragSrc||dragSrc===el)return;
+      el.classList.remove('drag-over');
+      const srcId=dragSrc.dataset.folder;
+      const tgtId=el.dataset.folder;
+      const srcIdx=folders.findIndex(f=>f.id===srcId);
+      const tgtIdx=folders.findIndex(f=>f.id===tgtId);
+      if(srcIdx<0||tgtIdx<0)return;
+      const[moved]=folders.splice(srcIdx,1);
+      folders.splice(tgtIdx,0,moved);
+      render();
+      saveFolderOrder();
+      toast('Category order saved');
+    });
+  });
+}
+
+// ── MAIN GRID with drag-to-reorder ────────────────────────────────────────
 function renderMain(){
   const q=searchQuery.trim().toLowerCase();
   let list=[...sites];
@@ -489,25 +473,40 @@ function renderMain(){
     const mfids=folders.filter(f=>f.name.toLowerCase().includes(q)).map(f=>f.id);
     list=sites.filter(s=>(s.name||'').toLowerCase().includes(q)||(s.description||'').toLowerCase().includes(q)||(s.url||'').toLowerCase().includes(q)||mfids.includes(s.folder_id));
   }
+
   const banner=document.getElementById('search-banner');
   if(searching){
     banner.style.display='flex';
     banner.innerHTML=`<span>Found <strong>${list.length}</strong> result${list.length!==1?'s':''} for "<em>${esc(q)}</em>"</span><button class="btn btn-sm" id="clear-search">Clear</button>`;
     document.getElementById('clear-search').onclick=()=>{document.getElementById('search-input').value='';searchQuery='';render();};
-  }else banner.style.display='none';
+  } else banner.style.display='none';
 
   const folder=folders.find(f=>f.id===activeFolder);
   document.getElementById('page-title').textContent=searching?'Search Results':(activeFolder==='all'?'All Sites':(folder?.name||''));
 
   const grid=document.getElementById('sites-grid');
   let html='';
-  if(list.length===0&&!searching)html+=`<div class="empty-state"><div class="empty-icon">🌐</div><p>${activeFolder==='all'?'No sites yet':'No sites in this category'}</p><small>Click "+ Add Site" to get started</small></div>`;
+  if(list.length===0&&!searching)html+=`<div class="empty-state"><div class="empty-icon">🌐</div><p>${activeFolder==='all'?'No sites yet':'No sites in this category'}</p>${!isReadOnly?`<small>Click "+ Add Site" to get started</small>`:''}</div>`;
+
   list.forEach(site=>{
     const fav=faviconUrl(site.url);
-    html+=`<div class="site-card" data-id="${site.id}"><div class="site-logo"><img src="${fav}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" onload="this.nextElementSibling.style.display='none'"/><span style="display:none;width:100%;height:100%;align-items:center;justify-content:center">${initial(site)}</span></div><div class="site-name">${esc(site.name||urlHost(site.url))}</div>${site.description?`<div class="site-desc">${esc(site.description)}</div>`:''}<div class="site-host">${esc(urlHost(site.url))}</div><button class="card-menu" data-menu="${site.id}">⋯</button></div>`;
+    html+=`<div class="site-card" data-id="${site.id}" draggable="${!isReadOnly&&!searching}">
+      ${!isReadOnly&&!searching?`<span class="drag-hint">⠿ drag</span>`:''}
+      <div class="site-logo">
+        <img src="${fav}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" onload="this.nextElementSibling.style.display='none'"/>
+        <span style="display:none;width:100%;height:100%;align-items:center;justify-content:center">${initial(site)}</span>
+      </div>
+      <div class="site-name">${esc(site.name||urlHost(site.url))}</div>
+      ${site.description?`<div class="site-desc">${esc(site.description)}</div>`:''}
+      <div class="site-host">${esc(urlHost(site.url))}</div>
+      ${!isReadOnly?`<button class="card-menu" data-menu="${site.id}">⋯</button>`:''}
+    </div>`;
   });
-  html+=`<div class="add-card" id="add-card-btn"><div class="plus-ring">+</div><span>Add site</span></div>`;
+
+  if(!isReadOnly)html+=`<div class="add-card" id="add-card-btn"><div class="plus-ring">+</div><span>Add site</span></div>`;
   grid.innerHTML=html;
+
+  // click to open
   grid.querySelectorAll('.site-card').forEach(card=>{
     card.addEventListener('click',e=>{
       if(e.target.closest('.card-menu'))return;
@@ -515,14 +514,53 @@ function renderMain(){
       if(site)window.open(site.url,'_blank');
     });
   });
-  grid.querySelectorAll('[data-menu]').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();showSiteMenu(btn.dataset.menu,e);}));
-  document.getElementById('add-card-btn').onclick=()=>showAddModal();
+
+  if(!isReadOnly){
+    grid.querySelectorAll('[data-menu]').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();showSiteMenu(btn.dataset.menu,e);}));
+    document.getElementById('add-card-btn')?.addEventListener('click',()=>showAddModal());
+    if(!searching)setupSiteDrag(grid,list);
+  }
 }
 
-// ── SITE MENU ─────────────────────────────────────────────────────────────
+function setupSiteDrag(grid,visibleList){
+  let dragSrc=null;
+  grid.querySelectorAll('.site-card[draggable=true]').forEach(el=>{
+    el.addEventListener('dragstart',e=>{
+      dragSrc=el;el.classList.add('dragging');
+      e.dataTransfer.effectAllowed='move';
+    });
+    el.addEventListener('dragend',()=>{
+      el.classList.remove('dragging');
+      grid.querySelectorAll('.site-card').forEach(x=>x.classList.remove('drag-over'));
+    });
+    el.addEventListener('dragover',e=>{
+      e.preventDefault();e.dataTransfer.dropEffect='move';
+      grid.querySelectorAll('.site-card').forEach(x=>x.classList.remove('drag-over'));
+      if(el!==dragSrc)el.classList.add('drag-over');
+    });
+    el.addEventListener('drop',e=>{
+      e.preventDefault();
+      if(!dragSrc||dragSrc===el)return;
+      el.classList.remove('drag-over');
+      const srcId=dragSrc.dataset.id;
+      const tgtId=el.dataset.id;
+      const srcIdx=sites.findIndex(s=>s.id===srcId);
+      const tgtIdx=sites.findIndex(s=>s.id===tgtId);
+      if(srcIdx<0||tgtIdx<0)return;
+      const[moved]=sites.splice(srcIdx,1);
+      sites.splice(tgtIdx,0,moved);
+      render();
+      saveSiteOrder();
+      toast('Order saved');
+    });
+  });
+}
+
+// ── SITE CONTEXT MENU ─────────────────────────────────────────────────────
 let activeCtx=null;
 function closeCtx(){if(activeCtx){activeCtx.remove();activeCtx=null;}}
 document.addEventListener('click',closeCtx);
+
 function showSiteMenu(siteId,e){
   closeCtx();
   const site=sites.find(s=>s.id===siteId);if(!site)return;
@@ -536,19 +574,19 @@ function showSiteMenu(siteId,e){
   if(top+220>window.innerHeight)top=r.top-230;
   menu.style.top=top+'px';menu.style.left=left+'px';
   menu.querySelector('[data-edit]')?.addEventListener('click',()=>{closeCtx();showEditModal(siteId);});
-  menu.querySelectorAll('[data-move]').forEach(el=>el.addEventListener('click',()=>{updateSite(siteId,{folder_id:el.dataset.move||null});closeCtx();}));
+  menu.querySelectorAll('[data-move]').forEach(el=>el.addEventListener('click',()=>{updateSite(siteId,{folder_id:el.dataset.move});closeCtx();}));
   menu.querySelector('[data-move-out]')?.addEventListener('click',()=>{updateSite(siteId,{folder_id:null});closeCtx();});
   menu.querySelector('[data-del]')?.addEventListener('click',()=>{closeCtx();if(confirm('Remove this site?'))deleteSite(siteId);});
 }
 
-// ── ADD/EDIT MODAL ────────────────────────────────────────────────────────
+// ── ADD / EDIT MODAL ──────────────────────────────────────────────────────
 function showAddModal(){openSiteModal({url:'',name:'',description:'',folder_id:activeFolder!=='all'?activeFolder:''});}
 function showEditModal(id){const site=sites.find(s=>s.id===id);if(site)openSiteModal({...site,_editing:true});}
 
 function openSiteModal(data){
   const isEdit=data._editing;
   const folderOpts=folders.map(f=>`<option value="${f.id}" ${data.folder_id===f.id?'selected':''}>${esc(f.name)}</option>`).join('');
-  const guestWarn=!user?`<div class="unsaved-warn"><span class="warn-icon">⚠️</span><div>You're not signed in — this site will <strong>not be saved</strong> when you close your browser. <a href="#" id="warn-signin" style="color:var(--accent)">Sign in now</a> to keep your data.</div></div>`:'';
+  const guestWarn=!user?`<div class="unsaved-warn"><span>⚠️</span><div>Not signed in — changes won't be saved. <a href="#" id="warn-signin" style="color:var(--accent)">Sign in now</a></div></div>`:'';
   openModal(`
     <div class="modal-head"><h3>${isEdit?'Edit Site':'Add New Site'}</h3><button class="btn btn-ghost btn-sm" id="mc">✕</button></div>
     <div class="modal-body">
@@ -574,7 +612,7 @@ function openSiteModal(data){
     e.preventDefault();const name=prompt('New category name:');
     if(name?.trim()){
       if(!user){const f=guestAddFolder(name.trim());const sel=document.getElementById('f-folder');sel.innerHTML+=`<option value="${f.id}" selected>${esc(f.name)}</option>`;sel.value=f.id;return;}
-      const{data:f,error}=await sb.from('folders').insert({user_id:user.id,name:name.trim()}).select().single();
+      const{data:f,error}=await sb.from('folders').insert({user_id:user.id,name:name.trim(),order_index:folders.length}).select().single();
       if(!error){folders.push(f);const sel=document.getElementById('f-folder');sel.innerHTML+=`<option value="${f.id}" selected>${esc(f.name)}</option>`;sel.value=f.id;renderSidebar();}
     }
   };
@@ -590,9 +628,8 @@ function openSiteModal(data){
       if(isEdit)await updateSite(data.id,{url,name,description,folder_id});
       else await saveSite({url,name,description,folder_id});
       closeModal();
-    }catch(e){
-      toast('Something went wrong — check console');
-      console.error(e);
+    }catch(err){
+      toast('Something went wrong');console.error(err);
       btn.textContent=isEdit?'Save Changes':'Add Site';btn.disabled=false;
     }
   };
@@ -604,7 +641,7 @@ document.getElementById('add-folder-btn').onclick=()=>{
   openModal(`
     <div class="modal-head"><h3>New Category</h3><button class="btn btn-ghost btn-sm" id="mc">✕</button></div>
     <div class="modal-body">
-      ${!user?`<div class="unsaved-warn"><span class="warn-icon">⚠️</span><div>You're not signed in — this won't be saved. <a href="#" id="warn-signin" style="color:var(--accent)">Sign in first</a></div></div>`:''}
+      ${!user?`<div class="unsaved-warn"><span>⚠️</span><div>Not signed in — won't be saved. <a href="#" id="warn-signin" style="color:var(--accent)">Sign in first</a></div></div>`:''}
       <div class="field"><label>Name</label><input type="text" id="f-cat-name" placeholder="e.g. AI Tools, Shopping, Work…"/></div>
     </div>
     <div class="modal-foot"><button class="btn" id="m-cancel">Cancel</button><button class="btn btn-primary" id="m-save">Create</button></div>
@@ -631,7 +668,7 @@ function showRenameFolder(id){
 
 // ── SHARE MODAL ───────────────────────────────────────────────────────────
 document.getElementById('share-btn').onclick=()=>{
-  if(!user)return;
+  if(!user||isReadOnly)return;
   const shareUrl=`${window.location.origin}${window.location.pathname}?user=${user.id}`;
   openModal(`
     <div class="modal-head"><h3>Share Your Page</h3><button class="btn btn-ghost btn-sm" id="mc">✕</button></div>
@@ -641,7 +678,7 @@ document.getElementById('share-btn').onclick=()=>{
         <span style="font-size:14px;font-weight:500">${isPublic?'🌍 Page is Public':'🔒 Page is Private'}</span>
         <button class="btn ${isPublic?'':'btn-primary'}" id="toggle-public">${isPublic?'Make Private':'Make Public'}</button>
       </div>
-      ${isPublic?`<div class="share-url">${shareUrl}</div><button class="btn btn-sm" style="margin-top:8px" id="copy-url">📋 Copy Link</button>`:''}
+      ${isPublic?`<div class="share-url">${shareUrl}</div><button class="btn btn-sm" style="margin-top:8px" id="copy-url">📋 Copy Link</button>`:'<p style="font-size:12px;color:var(--text-light);margin-top:10px">Make your page public first to get a shareable link.</p>'}
     </div>
     <div class="modal-foot"><button class="btn" id="mc2">Close</button></div>
   `);
@@ -650,6 +687,62 @@ document.getElementById('share-btn').onclick=()=>{
   document.getElementById('toggle-public')?.addEventListener('click',async()=>{await togglePublic();closeModal();document.getElementById('share-btn').click();});
   document.getElementById('copy-url')?.addEventListener('click',()=>{navigator.clipboard.writeText(shareUrl);toast('Link copied!');});
 };
+
+// ── AUTH MODAL ────────────────────────────────────────────────────────────
+function showAuthModal(mode='signin'){
+  const isSignin=mode==='signin';
+  openModal(`
+    <div class="modal-head" style="padding-bottom:18px">
+      <div><div style="font-size:22px;font-weight:600;margin-bottom:4px">${isSignin?'Welcome back':'Create account'}</div>
+      <div style="font-size:14px;color:var(--text-muted)">${isSignin?'Sign in to sync your navigator across all devices.':'Free account — your data is private and syncs everywhere.'}</div></div>
+      <button class="btn btn-ghost btn-sm" id="mc" style="align-self:flex-start">✕</button>
+    </div>
+    <div class="modal-body" style="padding-top:0">
+      <button class="social-btn github" id="gh-btn">
+        <svg class="gh-ico" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+        Continue with GitHub
+      </button>
+      <button class="social-btn google" id="gg-btn">
+        <svg class="g-ico" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Continue with Google
+      </button>
+      <div class="divider">or ${isSignin?'sign in':'sign up'} with email</div>
+      <div class="auth-error" id="auth-err"></div>
+      <div class="field"><label>Email</label><input type="email" id="a-email" placeholder="you@example.com" autocomplete="email"/></div>
+      <div class="field"><label>Password</label><input type="password" id="a-pass" placeholder="${isSignin?'Your password':'At least 6 characters'}" autocomplete="${isSignin?'current-password':'new-password'}"/></div>
+      ${!isSignin?`<div class="field"><label>Confirm Password</label><input type="password" id="a-pass2" placeholder="Repeat password" autocomplete="new-password"/></div>`:''}
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:11px" id="a-submit">${isSignin?'Sign in':'Create account'}</button>
+      <div class="auth-toggle">${isSignin?`Don't have an account? <a id="a-switch">Sign up free</a>`:`Already have an account? <a id="a-switch">Sign in</a>`}</div>
+    </div>
+  `,'');
+  document.getElementById('mc').onclick=closeModal;
+  document.getElementById('gh-btn').onclick=()=>sb.auth.signInWithOAuth({provider:'github',options:{redirectTo:window.location.href}});
+  document.getElementById('gg-btn').onclick=()=>sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.href}});
+  document.getElementById('a-switch').onclick=()=>showAuthModal(isSignin?'signup':'signin');
+  document.getElementById('a-submit').onclick=async()=>{
+    const email=document.getElementById('a-email').value.trim();
+    const pass=document.getElementById('a-pass').value;
+    const errEl=document.getElementById('auth-err');errEl.style.display='none';
+    if(!email||!pass){showAuthError('Please fill in all fields.');return;}
+    if(!isSignin){
+      const pass2=document.getElementById('a-pass2').value;
+      if(pass!==pass2){showAuthError('Passwords do not match.');return;}
+      if(pass.length<6){showAuthError('Password must be at least 6 characters.');return;}
+    }
+    const btn=document.getElementById('a-submit');btn.textContent='Please wait…';btn.disabled=true;
+    const{error}=isSignin?await sb.auth.signInWithPassword({email,password:pass}):await sb.auth.signUp({email,password:pass});
+    if(error){showAuthError(error.message);btn.textContent=isSignin?'Sign in':'Create account';btn.disabled=false;}
+    else if(!isSignin){showAuthError('✅ Check your email to confirm your account, then sign in.',true);btn.textContent='Create account';btn.disabled=false;}
+  };
+  document.getElementById('a-pass').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('a-submit').click();});
+  document.getElementById('a-email').focus();
+}
+function showAuthError(msg,success=false){
+  const el=document.getElementById('auth-err');if(!el)return;
+  el.textContent=msg;el.style.display='block';
+  if(success){el.style.background='#f0fdf4';el.style.borderColor='#86efac';el.style.color='#166534';}
+  else{el.style.background='#fef2f2';el.style.borderColor='#fecaca';el.style.color='';}
+}
 
 // ── USER MENU ─────────────────────────────────────────────────────────────
 let userMenu=null;
@@ -665,7 +758,7 @@ function showUserMenu(){
 }
 document.addEventListener('click',()=>{if(userMenu){userMenu.remove();userMenu=null;}});
 
-// ── SEARCH ────────────────────────────────────────────────────────────────
+// ── SEARCH & TOPBAR ───────────────────────────────────────────────────────
 document.getElementById('search-input').addEventListener('input',e=>{searchQuery=e.target.value;render();});
 document.getElementById('add-site-btn').onclick=()=>showAddModal();
 
