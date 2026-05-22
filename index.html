@@ -184,6 +184,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <div class="page-title" id="page-title">All Sites</div>
       <span id="public-badge" style="display:none" class="public-badge">Public</span>
       <span id="viewing-badge" style="display:none" class="viewing-badge">👀 Viewing shared page</span>
+      <button id="back-to-mine-btn" style="display:none" class="btn btn-sm btn-primary">← My Navigator</button>
     </div>
     <div id="guest-banner" style="display:none">
       <div><strong>👋 You're browsing as a guest.</strong> Any changes won't be saved. Sign in to keep your data across all devices.</div>
@@ -207,8 +208,9 @@ const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 let user=null;
 let folders=[],sites=[],isPublic=false,activeFolder='all',searchQuery='';
-let viewingUserId=null; // set when viewing someone else's shared page
+let viewingUserId=null;
 let isReadOnly=false;
+let sharedFolderOnly=false; // true when URL has folder= param — block viewing all sites
 
 // ── INIT ──────────────────────────────────────────────────────────────────
 async function init(){
@@ -227,9 +229,9 @@ async function init(){
   if(session){user=session.user;}
 
   if(sharedUserId && sharedUserId!==user?.id){
-    // Viewing someone else's page — load their public data
     viewingUserId=sharedUserId;
     isReadOnly=true;
+    sharedFolderOnly=!!sharedFolderId;
     await loadSharedData(sharedUserId,sharedFolderId);
   } else {
     viewingUserId=null;
@@ -272,10 +274,17 @@ async function init(){
 function showApp(){
   document.getElementById('loading').style.display='none';
   renderAuthArea();
-  // Show/hide edit controls based on read-only
   document.getElementById('add-site-btn').style.display=isReadOnly?'none':'inline-flex';
   document.getElementById('add-folder-btn').style.display=isReadOnly?'none':'block';
   document.getElementById('share-btn').style.display=(user&&!isReadOnly)?'inline-flex':'none';
+  document.getElementById('viewing-badge').style.display=isReadOnly?'inline-flex':'none';
+  const backBtn=document.getElementById('back-to-mine-btn');
+  if(isReadOnly&&user){
+    backBtn.style.display='inline-flex';
+    backBtn.onclick=()=>{window.location.href=window.location.pathname;};
+  } else {
+    backBtn.style.display='none';
+  }
   render();
 }
 
@@ -309,7 +318,6 @@ async function loadSharedData(userId,folderId=null){
   const{data:profile}=await sb.from('profiles').select('*').eq('id',userId).eq('is_public',true).single();
   if(!profile){
     folders=[];sites=[];
-    // Show a permanent message in the main area instead of a toast
     document.getElementById('sites-grid').innerHTML=`
       <div class="empty-state">
         <div class="empty-icon">🔒</div>
@@ -318,6 +326,20 @@ async function loadSharedData(userId,folderId=null){
       </div>`;
     return;
   }
+
+  // If folderId was in the original URL, ONLY load that folder
+  // If someone removed folder= from URL, block them — treat as invalid
+  if(sharedFolderOnly && !folderId){
+    folders=[];sites=[];
+    document.getElementById('sites-grid').innerHTML=`
+      <div class="empty-state">
+        <div class="empty-icon">🔒</div>
+        <p>This link is for a specific category only.</p>
+        <small>You don't have permission to view the full navigator.</small>
+      </div>`;
+    return;
+  }
+
   let fQuery=sb.from('folders').select('*').eq('user_id',userId).order('order_index').order('created_at');
   let sQuery=sb.from('sites').select('*').eq('user_id',userId).order('order_index').order('created_at');
   if(folderId){
