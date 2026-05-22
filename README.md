@@ -9,14 +9,12 @@
 
 ## What it does
 
-| | |
-|---|---|
-| 🌐 **Save any website** | Add a URL and it auto-fetches the logo |
-| 📁 **Organize into folders** | Create categories like AI, Shopping, Work |
-| 🔍 **Search everything** | Find sites by name, description, or category |
-| ↕️ **Drag to reorder** | Arrange sites and folders exactly how you want |
-| 🔄 **Syncs everywhere** | Sign in and your data follows you to every device |
-| 🔗 **Share your page** | Make your navigator public and share the link |
+- 🌐 **Save any website** | Add a URL and it auto-fetches the logo
+- 📁 **Organize into folders** | Create categories like AI, Shopping, Work
+- 🔍 **Search everything** | Find sites by name, description, or category
+- ↕️ **Drag to reorder** | Arrange sites and folders exactly how you want
+- 🔄 **Syncs everywhere** | Sign in and your data follows you to every device
+- 🔗 **Share your page** | Make your navigator public and share the link
 
 ---
 
@@ -25,6 +23,10 @@
 1. Visit the site
 2. Click **+ Add Site** — no account needed
 3. Sign up to sync across devices
+
+---
+
+![App Screenshot](Screenshot%202026-05-21%20210140.png)
 
 ---
 
