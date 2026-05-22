@@ -966,8 +966,17 @@ function showAuthModal(mode='signin'){
             showAuthError('This email is already registered. Please sign in instead.');
           }
         } else {
-          showAuthError('✅ Confirmation email sent! Please check your inbox.<br/><span style="margin-top:6px;display:block">Already have an account? <a href="#" id="switch-to-signin" style="color:var(--accent)">Sign in instead</a></span>',true);
-          setTimeout(()=>{document.getElementById('switch-to-signin')?.addEventListener('click',e=>{e.preventDefault();showAuthModal('signin');});},100);
+          showAuthError('✅ Confirmation email sent! Please check your inbox.',true);
+          setTimeout(()=>{
+            const err=document.getElementById('auth-err');
+            if(err){
+              const link=document.createElement('div');
+              link.style.cssText='margin-top:6px;font-size:12px';
+              link.innerHTML=`Already have an account? <a href="#" style="color:#2563eb">Sign in instead</a>`;
+              link.querySelector('a').onclick=e=>{e.preventDefault();showAuthModal('signin');};
+              err.appendChild(link);
+            }
+          },50);
         }
       }
     }catch(e){
@@ -991,13 +1000,80 @@ function showUserMenu(){
   if(userMenu){userMenu.remove();userMenu=null;return;}
   const meta=user.user_metadata||{};
   const menu=document.createElement('div');menu.className='user-menu';
-  menu.innerHTML=`<div class="user-info"><div class="u-name">${esc(meta.full_name||meta.user_name||'')}</div><div class="u-email">${esc(user.email||'')}</div></div><div class="ctx-item danger" id="signout-btn">🚪 Sign out</div>`;
+  menu.innerHTML=`
+    <div class="user-info">
+      <div class="u-name">${esc(meta.full_name||meta.user_name||'')}</div>
+      <div class="u-email">${esc(user.email||'')}</div>
+    </div>
+    <div class="ctx-item danger" id="signout-btn">🚪 Sign out</div>
+    <div class="ctx-sep"></div>
+    <div class="ctx-item danger" id="delete-account-btn" style="font-size:12px;color:#dc2626;opacity:.7">🗑️ Delete Account</div>`;
   document.body.appendChild(menu);userMenu=menu;
   const r=document.getElementById('auth-area').getBoundingClientRect();
   menu.style.top=(r.bottom+8)+'px';menu.style.right=(window.innerWidth-r.right)+'px';
   document.getElementById('signout-btn').onclick=()=>sb.auth.signOut();
+  document.getElementById('delete-account-btn').onclick=e=>{
+    e.stopPropagation();
+    userMenu.remove();userMenu=null;
+    showDeleteAccountModal();
+  };
 }
 document.addEventListener('click',()=>{if(userMenu){userMenu.remove();userMenu=null;}});
+
+function showDeleteAccountModal(){
+  openModal(`
+    <div class="modal-head"><h3>Delete Account</h3><button class="btn btn-ghost btn-sm" id="mc">✕</button></div>
+    <div class="modal-body">
+      <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:var(--radius-sm);padding:14px;margin-bottom:16px;font-size:14px;color:#dc2626">
+        ⚠️ <strong>This action is permanent and cannot be undone.</strong>
+      </div>
+      <p style="font-size:14px;color:var(--text-muted);margin-bottom:16px;line-height:1.6">
+        Deleting your account will permanently remove:<br/>
+        • All your saved sites<br/>
+        • All your categories<br/>
+        • Your account and login
+      </p>
+      <div class="field">
+        <label>Type <strong>DELETE</strong> to confirm</label>
+        <input type="text" id="delete-confirm-input" placeholder="DELETE" autocomplete="off"/>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" id="m-cancel">Cancel</button>
+      <button class="btn" id="m-delete" style="background:#dc2626;color:#fff;border-color:#dc2626;opacity:.5" disabled>Delete My Account</button>
+    </div>
+  `);
+  document.getElementById('mc').onclick=closeModal;
+  document.getElementById('m-cancel').onclick=closeModal;
+
+  // Enable delete button only when user types DELETE
+  document.getElementById('delete-confirm-input').addEventListener('input',function(){
+    const btn=document.getElementById('m-delete');
+    if(this.value==='DELETE'){btn.disabled=false;btn.style.opacity='1';}
+    else{btn.disabled=true;btn.style.opacity='.5';}
+  });
+
+  document.getElementById('m-delete').onclick=async()=>{
+    const btn=document.getElementById('m-delete');
+    btn.textContent='Deleting…';btn.disabled=true;
+    try{
+      // Delete all user data first
+      await Promise.all([
+        sb.from('sites').delete().eq('user_id',user.id),
+        sb.from('folders').delete().eq('user_id',user.id),
+        sb.from('profiles').delete().eq('id',user.id),
+      ]);
+      // Delete the auth user via RPC
+      await sb.rpc('delete_user');
+      await sb.auth.signOut();
+      closeModal();
+      toast('Your account has been permanently deleted.');
+    }catch(e){
+      toast('Error: '+e.message);
+      btn.textContent='Delete My Account';btn.disabled=false;
+    }
+  };
+}
 
 // ── MOBILE MENU ───────────────────────────────────────────────────────────
 document.getElementById('menu-btn').onclick=e=>{
