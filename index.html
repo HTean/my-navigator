@@ -960,7 +960,11 @@ function showAuthModal(mode='signin'){
         const{error}=await sb.auth.signInWithPassword({email,password:pass});
         if(error){showAuthError(error.message);btn.textContent='Sign in';btn.disabled=false;submitting=false;}
       } else {
-        const{data,error}=await sb.auth.signUp({email,password:pass});
+        const{data,error}=await sb.auth.signUp({
+          email,
+          password:pass,
+          options:{emailRedirectTo:'https://htean.github.io/my-navigator'}
+        });
         btn.textContent='Create account';btn.disabled=false;submitting=false;
         if(error){
           showAuthError(error.message);
