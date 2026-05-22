@@ -206,6 +206,44 @@ const SUPABASE_URL='https://vhljeqeqedtrqspevidm.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZobGplcWVxZWR0cnFzcGV2aWRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzk3NDEsImV4cCI6MjA5NDk1NTc0MX0.TcUhUJFSsYMrbIYh7yh9Zb1bkVzCa5Eys7Koddo3G9o';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
+// ── CRYPTO ────────────────────────────────────────────────────────────────
+// AES-GCM encryption for share tokens — hides user/folder IDs from URL
+const SHARE_SECRET='nav-2025-xK9#mP3$qL7@wR1'; // change this to any secret string
+
+async function getKey(){
+  const raw=new TextEncoder().encode(SHARE_SECRET.padEnd(32).slice(0,32));
+  return crypto.subtle.importKey('raw',raw,{name:'AES-GCM'},false,['encrypt','decrypt']);
+}
+
+async function encryptToken(payload){
+  // payload: {u: userId, f: folderId|null}
+  const key=await getKey();
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const data=new TextEncoder().encode(JSON.stringify(payload));
+  const encrypted=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,data);
+  // Combine iv + encrypted, encode as url-safe base64
+  const combined=new Uint8Array(iv.byteLength+encrypted.byteLength);
+  combined.set(iv,0);
+  combined.set(new Uint8Array(encrypted),iv.byteLength);
+  return btoa(String.fromCharCode(...combined))
+    .replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+}
+
+async function decryptToken(token){
+  try{
+    // Restore base64 padding
+    const b64=token.replace(/-/g,'+').replace(/_/g,'/')+'=='.slice(0,(4-token.length%4)%4);
+    const combined=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
+    const iv=combined.slice(0,12);
+    const encrypted=combined.slice(12);
+    const key=await getKey();
+    const decrypted=await crypto.subtle.decrypt({name:'AES-GCM',iv},key,encrypted);
+    return JSON.parse(new TextDecoder().decode(decrypted));
+  }catch(e){
+    return null; // invalid or tampered token
+  }
+}
+
 let user=null;
 let folders=[],sites=[],isPublic=false,activeFolder='all',searchQuery='';
 let viewingUserId=null;
@@ -220,19 +258,28 @@ async function init(){
     history.replaceState(null,'',window.location.pathname);
   }
 
-  // Check if viewing a shared page (?user=UUID)
+  // Check if viewing a shared page
   const params=new URLSearchParams(window.location.search);
-  const sharedUserId=params.get('user');
-  const sharedFolderId=params.get('folder');
+  const shareToken=params.get('share');
+  let resolvedUserId=null;
+  let resolvedFolderId=null;
+
+  if(shareToken){
+    const payload=await decryptToken(shareToken);
+    if(payload){
+      resolvedUserId=payload.u||null;
+      resolvedFolderId=payload.f||null;
+    }
+  }
 
   const{data:{session}}=await sb.auth.getSession();
   if(session){user=session.user;}
 
-  if(sharedUserId && sharedUserId!==user?.id){
-    viewingUserId=sharedUserId;
+  if(resolvedUserId && resolvedUserId!==user?.id){
+    viewingUserId=resolvedUserId;
     isReadOnly=true;
-    sharedFolderOnly=!!sharedFolderId;
-    await loadSharedData(sharedUserId,sharedFolderId);
+    sharedFolderOnly=!!resolvedFolderId;
+    await loadSharedData(resolvedUserId,resolvedFolderId||null);
   } else {
     viewingUserId=null;
     isReadOnly=false;
@@ -326,20 +373,6 @@ async function loadSharedData(userId,folderId=null){
       </div>`;
     return;
   }
-
-  // If folderId was in the original URL, ONLY load that folder
-  // If someone removed folder= from URL, block them — treat as invalid
-  if(sharedFolderOnly && !folderId){
-    folders=[];sites=[];
-    document.getElementById('sites-grid').innerHTML=`
-      <div class="empty-state">
-        <div class="empty-icon">🔒</div>
-        <p>This link is for a specific category only.</p>
-        <small>You don't have permission to view the full navigator.</small>
-      </div>`;
-    return;
-  }
-
   let fQuery=sb.from('folders').select('*').eq('user_id',userId).order('order_index').order('created_at');
   let sQuery=sb.from('sites').select('*').eq('user_id',userId).order('order_index').order('created_at');
   if(folderId){
@@ -856,9 +889,12 @@ document.getElementById('share-btn').onclick=()=>{
   function updateShareLink(){
     const scope=document.getElementById('share-scope')?.value;
     if(!scope)return;
-    const url=scope==='all'?`${baseUrl}?user=${user.id}`:`${baseUrl}?user=${user.id}&folder=${scope}`;
-    document.getElementById('share-link-url').textContent=url;
-    document.getElementById('copy-share-url').onclick=()=>{navigator.clipboard.writeText(url);toast('Link copied!');};
+    const payload=scope==='all'?{u:user.id,f:null}:{u:user.id,f:scope};
+    encryptToken(payload).then(token=>{
+      const url=`${baseUrl}?share=${token}`;
+      document.getElementById('share-link-url').textContent=url;
+      document.getElementById('copy-share-url').onclick=()=>{navigator.clipboard.writeText(url);toast('Link copied!');};
+    });
   }
   document.getElementById('share-scope')?.addEventListener('change',updateShareLink);
   updateShareLink();
