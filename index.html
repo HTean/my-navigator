@@ -307,7 +307,17 @@ async function loadData(){
 
 async function loadSharedData(userId,folderId=null){
   const{data:profile}=await sb.from('profiles').select('*').eq('id',userId).eq('is_public',true).single();
-  if(!profile){folders=[];sites=[];toast('This page is private or does not exist.');return;}
+  if(!profile){
+    folders=[];sites=[];
+    // Show a permanent message in the main area instead of a toast
+    document.getElementById('sites-grid').innerHTML=`
+      <div class="empty-state">
+        <div class="empty-icon">🔒</div>
+        <p>This page is private or does not exist.</p>
+        <small>The owner may have made it private or the link is incorrect.</small>
+      </div>`;
+    return;
+  }
   let fQuery=sb.from('folders').select('*').eq('user_id',userId).order('order_index').order('created_at');
   let sQuery=sb.from('sites').select('*').eq('user_id',userId).order('order_index').order('created_at');
   if(folderId){
@@ -794,44 +804,25 @@ function showRenameFolder(id){
 document.getElementById('share-btn').onclick=()=>{
   if(!user||isReadOnly)return;
   const baseUrl=`${window.location.origin}${window.location.pathname}`;
-  const wholeUrl=`${baseUrl}?user=${user.id}`;
-  const folderOpts=folders.map(f=>`<option value="${f.id}" ${activeFolder===f.id?'selected':''}>${esc(f.name)}</option>`).join('');
 
   openModal(`
     <div class="modal-head"><h3>Share</h3><button class="btn btn-ghost btn-sm" id="mc">✕</button></div>
     <div class="modal-body">
-      <p style="font-size:14px;color:var(--text-muted);margin-bottom:16px">Choose what to share. Your page must be public for links to work.</p>
-
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:16px">
         <span style="font-size:14px;font-weight:500">${isPublic?'🌍 Page is Public':'🔒 Page is Private'}</span>
         <button class="btn ${isPublic?'':'btn-primary'} btn-sm" id="toggle-public">${isPublic?'Make Private':'Make Public'}</button>
       </div>
-
       ${isPublic?`
-      <div style="border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden">
-        <div style="padding:14px;border-bottom:1px solid var(--border)">
-          <div style="font-weight:500;font-size:14px;margin-bottom:4px">🌐 Share whole navigator</div>
-          <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">All your sites and categories</div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <div class="share-url" style="flex:1;margin:0;font-size:11px">${wholeUrl}</div>
-            <button class="btn btn-sm" data-copy="${wholeUrl}">📋</button>
-          </div>
-        </div>
-        ${folders.length>0?`
-        <div style="padding:14px">
-          <div style="font-weight:500;font-size:14px;margin-bottom:4px">📁 Share a specific folder</div>
-          <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Only sites in that category will be visible</div>
-          <select id="share-folder-sel" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;background:var(--bg);margin-bottom:10px">
-            <option value="">— Select a category —</option>
-            ${folderOpts}
-          </select>
-          <div id="folder-share-row" style="display:none;gap:8px;align-items:center">
-            <div class="share-url" id="folder-share-url" style="flex:1;margin:0;font-size:11px"></div>
-            <button class="btn btn-sm" id="copy-folder-url">📋</button>
-          </div>
-        </div>`:''}
+      <div class="field">
+        <label>What to share</label>
+        <select id="share-scope">
+          <option value="all" ${activeFolder==='all'?'selected':''}>🏠 All Sites (entire navigator)</option>
+          ${folders.map(f=>`<option value="${f.id}" ${activeFolder===f.id?'selected':''}>📁 ${esc(f.name)}</option>`).join('')}
+        </select>
       </div>
-      `:'<p style="font-size:12px;color:var(--text-light);margin-top:10px">Make your page public first to get shareable links.</p>'}
+      <div class="share-url" id="share-link-url" style="font-size:12px;margin-top:4px"></div>
+      <button class="btn btn-sm" style="margin-top:8px" id="copy-share-url">📋 Copy Link</button>
+      `:'<p style="font-size:13px;color:var(--text-muted);margin-top:4px">Make your page public first to get a shareable link.</p>'}
     </div>
     <div class="modal-foot"><button class="btn" id="mc2">Close</button></div>
   `);
@@ -840,22 +831,15 @@ document.getElementById('share-btn').onclick=()=>{
   document.getElementById('mc2').onclick=closeModal;
   document.getElementById('toggle-public')?.addEventListener('click',async()=>{await togglePublic();closeModal();document.getElementById('share-btn').click();});
 
-  // copy whole url
-  document.querySelectorAll('[data-copy]').forEach(btn=>{
-    btn.addEventListener('click',()=>{navigator.clipboard.writeText(btn.dataset.copy);toast('Link copied!');});
-  });
-
-  // folder share
-  document.getElementById('share-folder-sel')?.addEventListener('change',function(){
-    const row=document.getElementById('folder-share-row');
-    const urlEl=document.getElementById('folder-share-url');
-    if(this.value){
-      const url=`${baseUrl}?user=${user.id}&folder=${this.value}`;
-      urlEl.textContent=url;
-      row.style.display='flex';
-      document.getElementById('copy-folder-url').onclick=()=>{navigator.clipboard.writeText(url);toast('Link copied!');};
-    } else row.style.display='none';
-  });
+  function updateShareLink(){
+    const scope=document.getElementById('share-scope')?.value;
+    if(!scope)return;
+    const url=scope==='all'?`${baseUrl}?user=${user.id}`:`${baseUrl}?user=${user.id}&folder=${scope}`;
+    document.getElementById('share-link-url').textContent=url;
+    document.getElementById('copy-share-url').onclick=()=>{navigator.clipboard.writeText(url);toast('Link copied!');};
+  }
+  document.getElementById('share-scope')?.addEventListener('change',updateShareLink);
+  updateShareLink();
 };
 
 // ── AUTH MODAL ────────────────────────────────────────────────────────────
@@ -909,13 +893,20 @@ function showAuthModal(mode='signin'){
         if(error){showAuthError(error.message);btn.textContent='Sign in';btn.disabled=false;submitting=false;}
       } else {
         const{data,error}=await sb.auth.signUp({email,password:pass});
-        btn.textContent='Create account';btn.disabled=false;
+        btn.textContent='Create account';btn.disabled=false;submitting=false;
         if(error){
           showAuthError(error.message);
-          btn.textContent='Create account';btn.disabled=false;submitting=false;
+        } else if(data?.user?.created_at){
+          // If user was created within last 5 seconds → genuinely new
+          const age=Date.now()-new Date(data.user.created_at).getTime();
+          if(age<5000){
+            showAuthError('✅ Confirmation email sent! Please check your inbox and confirm your email to sign in.',true);
+          } else {
+            showAuthError('This email is already registered. Please sign in instead.');
+          }
         } else {
-          showAuthError('✅ Confirmation email sent! Please check your inbox and confirm your email to sign in.',true);
-          submitting=false;
+          showAuthError('✅ Confirmation email sent! Please check your inbox.<br/><span style="margin-top:6px;display:block">Already have an account? <a href="#" id="switch-to-signin" style="color:var(--accent)">Sign in instead</a></span>',true);
+          setTimeout(()=>{document.getElementById('switch-to-signin')?.addEventListener('click',e=>{e.preventDefault();showAuthModal('signin');});},100);
         }
       }
     }catch(e){
