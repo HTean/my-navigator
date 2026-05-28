@@ -487,29 +487,23 @@ function faviconUrl(url){
   }catch(e){return'';}
 }
 
-function faviconHtml(url,initial){
+function faviconHtml(url,init){
   try{
     const host=new URL(url).hostname;
-    // Root domain fallback: hpanel.hostinger.com → hostinger.com
     const parts=host.split('.');
-    const rootDomain=parts.length>2?parts.slice(-2).join('.'):host;
-    const google=`https://www.google.com/s2/favicons?domain=${host}&sz=64`;
-    const googleRoot=`https://www.google.com/s2/favicons?domain=${rootDomain}&sz=64`;
-    const duckduckgo=`https://icons.duckduckgo.com/ip3/${rootDomain}.ico`;
-    return`
-      <img src="${google}" alt="" loading="lazy"
-        data-f1="${googleRoot}" data-f2="${duckduckgo}" data-f3="" data-init="${initial}"
-        onload="this.nextElementSibling.style.display='none'"
-        onerror="
-          var f1=this.getAttribute('data-f1'),f2=this.getAttribute('data-f2');
-          if(this.src!==f1&&f1){this.src=f1;}
-          else if(this.src!==f2&&f2){this.src=f2;}
-          else{this.style.display='none';this.nextElementSibling.style.display='flex';}
-        "
-        style="width:100%;height:100%;object-fit:contain;display:block"/>
-      <span style="display:none;width:100%;height:100%;align-items:center;justify-content:center">${initial}</span>`;
+    const root=parts.length>2?parts.slice(-2).join('.'):host;
+    const s0=`https://www.google.com/s2/favicons?domain=${host}&sz=64`;
+    const s1=`https://www.google.com/s2/favicons?domain=${root}&sz=64`;
+    const s2=`https://icons.duckduckgo.com/ip3/${root}.ico`;
+    // Use single-quoted array — safe inside onerror="..." attribute
+    const srcs=`['${s0}','${s1}','${s2}']`;
+    return`<img src="${s0}" alt="" loading="lazy"
+      onload="this.nextElementSibling.style.display='none'"
+      onerror="(function(el){var s=${srcs},i=s.indexOf(el.src)+1;if(i>0&&i<s.length){el.src=s[i];}else{el.style.display='none';el.nextElementSibling.style.display='flex';}})(this)"
+      style="width:100%;height:100%;object-fit:contain;display:block"/>
+    <span style="display:none;width:100%;height:100%;align-items:center;justify-content:center">${init}</span>`;
   }catch(e){
-    return`<span style="width:100%;height:100%;display:flex;align-items:center;justify-content:center">${initial}</span>`;
+    return`<span style="width:100%;height:100%;display:flex;align-items:center;justify-content:center">${init}</span>`;
   }
 }
 function initial(site){return(site.name||site.url||'?')[0].toUpperCase();}
