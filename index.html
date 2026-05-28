@@ -480,7 +480,31 @@ async function saveSiteOrder(){
 // ── HELPERS ───────────────────────────────────────────────────────────────
 function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
 function urlHost(url){try{return new URL(url).hostname.replace('www.','');}catch(e){return url;}}
-function faviconUrl(url){try{return`https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=64`;}catch(e){return'';}}
+function faviconUrl(url){
+  try{
+    const host=new URL(url).hostname;
+    return`https://www.google.com/s2/favicons?domain=${host}&sz=64`;
+  }catch(e){return'';}
+}
+
+function faviconHtml(url,initial){
+  try{
+    const host=new URL(url).hostname;
+    const google=`https://www.google.com/s2/favicons?domain=${host}&sz=64`;
+    const duckduckgo=`https://icons.duckduckgo.com/ip3/${host}.ico`;
+    const favicon=`https://${host}/favicon.ico`;
+    return`
+      <img src="${google}" alt="" loading="lazy"
+        onerror="this.src='${duckduckgo}'"
+        data-fallback2="${favicon}"
+        data-initial="${initial}"
+        onload="this.nextElementSibling.style.display='none'"
+        style="width:100%;height:100%;object-fit:contain;display:block"/>
+      <span style="display:none;width:100%;height:100%;align-items:center;justify-content:center">${initial}</span>`;
+  }catch(e){
+    return`<span style="width:100%;height:100%;display:flex;align-items:center;justify-content:center">${initial}</span>`;
+  }
+}
 function initial(site){return(site.name||site.url||'?')[0].toUpperCase();}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
 
@@ -594,13 +618,9 @@ function renderMain(){
   if(list.length===0&&!searching)html+=`<div class="empty-state"><div class="empty-icon">🌐</div><p>${activeFolder==='all'?'No sites yet':'No sites in this category'}</p>${!isReadOnly?`<small>Click "+ Add Site" to get started</small>`:''}</div>`;
 
   list.forEach(site=>{
-    const fav=faviconUrl(site.url);
     html+=`<div class="site-card" data-id="${site.id}" draggable="${!isReadOnly&&!searching}">
       ${!isReadOnly&&!searching?`<span class="drag-hint">⠿ drag</span>`:''}
-      <div class="site-logo">
-        <img src="${fav}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" onload="this.nextElementSibling.style.display='none'"/>
-        <span style="display:none;width:100%;height:100%;align-items:center;justify-content:center">${initial(site)}</span>
-      </div>
+      <div class="site-logo">${faviconHtml(site.url,initial(site))}</div>
       <div class="site-name">${esc(site.name||urlHost(site.url))}</div>
       ${site.description?`<div class="site-desc">${esc(site.description)}</div>`:''}
       <div class="site-host">${esc(urlHost(site.url))}</div>
@@ -610,6 +630,20 @@ function renderMain(){
 
   if(!isReadOnly)html+=`<div class="add-card" id="add-card-btn"><div class="plus-ring">+</div><span>Add site</span></div>`;
   grid.innerHTML=html;
+
+  // Second favicon fallback: if DuckDuckGo also fails, try direct favicon.ico then show initial
+  grid.querySelectorAll('.site-logo img').forEach(img=>{
+    img.addEventListener('error',function(){
+      const fallback2=this.getAttribute('data-fallback2');
+      const initial=this.getAttribute('data-initial');
+      if(fallback2&&this.src!==fallback2){
+        this.src=fallback2;
+      } else {
+        this.style.display='none';
+        this.nextElementSibling.style.display='flex';
+      }
+    });
+  });
 
   // click to open
   grid.querySelectorAll('.site-card').forEach(card=>{
