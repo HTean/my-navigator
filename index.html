@@ -490,15 +490,22 @@ function faviconUrl(url){
 function faviconHtml(url,initial){
   try{
     const host=new URL(url).hostname;
+    // Root domain fallback: hpanel.hostinger.com → hostinger.com
+    const parts=host.split('.');
+    const rootDomain=parts.length>2?parts.slice(-2).join('.'):host;
     const google=`https://www.google.com/s2/favicons?domain=${host}&sz=64`;
-    const duckduckgo=`https://icons.duckduckgo.com/ip3/${host}.ico`;
-    const favicon=`https://${host}/favicon.ico`;
+    const googleRoot=`https://www.google.com/s2/favicons?domain=${rootDomain}&sz=64`;
+    const duckduckgo=`https://icons.duckduckgo.com/ip3/${rootDomain}.ico`;
     return`
       <img src="${google}" alt="" loading="lazy"
-        onerror="this.src='${duckduckgo}'"
-        data-fallback2="${favicon}"
-        data-initial="${initial}"
+        data-f1="${googleRoot}" data-f2="${duckduckgo}" data-f3="" data-init="${initial}"
         onload="this.nextElementSibling.style.display='none'"
+        onerror="
+          var f1=this.getAttribute('data-f1'),f2=this.getAttribute('data-f2');
+          if(this.src!==f1&&f1){this.src=f1;}
+          else if(this.src!==f2&&f2){this.src=f2;}
+          else{this.style.display='none';this.nextElementSibling.style.display='flex';}
+        "
         style="width:100%;height:100%;object-fit:contain;display:block"/>
       <span style="display:none;width:100%;height:100%;align-items:center;justify-content:center">${initial}</span>`;
   }catch(e){
@@ -630,20 +637,6 @@ function renderMain(){
 
   if(!isReadOnly)html+=`<div class="add-card" id="add-card-btn"><div class="plus-ring">+</div><span>Add site</span></div>`;
   grid.innerHTML=html;
-
-  // Second favicon fallback: if DuckDuckGo also fails, try direct favicon.ico then show initial
-  grid.querySelectorAll('.site-logo img').forEach(img=>{
-    img.addEventListener('error',function(){
-      const fallback2=this.getAttribute('data-fallback2');
-      const initial=this.getAttribute('data-initial');
-      if(fallback2&&this.src!==fallback2){
-        this.src=fallback2;
-      } else {
-        this.style.display='none';
-        this.nextElementSibling.style.display='flex';
-      }
-    });
-  });
 
   // click to open
   grid.querySelectorAll('.site-card').forEach(card=>{
